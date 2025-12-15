@@ -1,4 +1,130 @@
 # Reference
+## OAuth2
+<details><summary><code>client.OAuth2.GetToken(request) -> *Lattice.GetTokenResponse</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Exchange authorization code, refresh token, client credentials, or resource owner credentials for an access token
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```go
+request := &Lattice.GetTokenRequest{
+        GrantType: Lattice.GetTokenRequestGrantTypeAuthorizationCode,
+    }
+client.OAuth2.GetToken(
+        context.TODO(),
+        request,
+    )
+}
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**grantType:** `*Lattice.GetTokenRequestGrantType` — The type of grant being requested
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**code:** `*string` — The authorization code (required for authorization_code grant type)
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**redirectURI:** `*string` — The redirect URI (required for authorization_code grant type)
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**clientID:** `*string` — The client identifier
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**clientSecret:** `*string` — The client secret
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**refreshToken:** `*string` — The refresh token (required for refresh_token grant type)
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**username:** `*string` — The resource owner username (required for password grant type)
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**password:** `*string` — The resource owner password (required for password grant type)
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**scope:** `*string` — The scope of the access request
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
 ## Entities
 <details><summary><code>client.Entities.PublishEntity(request) -> *Lattice.Entity</code></summary>
 <dl>
