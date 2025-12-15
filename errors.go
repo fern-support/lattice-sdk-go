@@ -4,10 +4,10 @@ package Lattice
 
 import (
 	json "encoding/json"
-	core "github.com/anduril/lattice-sdk-go/v4/core"
+	core "github.com/anduril/lattice-sdk-go/core"
 )
 
-// Bad request
+// Bad request or invalid request
 type BadRequestError struct {
 	*core.APIError
 	Body interface{}
@@ -177,7 +177,7 @@ func (t *TooManyRequestsError) Unwrap() error {
 	return t.APIError
 }
 
-// Unauthorized to access resource
+// Unauthorized - client authentication failed
 type UnauthorizedError struct {
 	*core.APIError
 	Body interface{}
