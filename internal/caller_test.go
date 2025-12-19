@@ -13,7 +13,7 @@ import (
 	"strconv"
 	"testing"
 
-	"github.com/anduril/lattice-sdk-go/v4/core"
+	"github.com/anduril/lattice-sdk-go/core"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -371,6 +371,80 @@ func newTestServer(t *testing.T, tc *InternalTestCase) *httptest.Server {
 			},
 		),
 	)
+}
+
+func TestIsNil(t *testing.T) {
+	t.Run("nil interface", func(t *testing.T) {
+		assert.True(t, isNil(nil))
+	})
+
+	t.Run("nil pointer", func(t *testing.T) {
+		var ptr *string
+		assert.True(t, isNil(ptr))
+	})
+
+	t.Run("non-nil pointer", func(t *testing.T) {
+		s := "test"
+		assert.False(t, isNil(&s))
+	})
+
+	t.Run("nil slice", func(t *testing.T) {
+		var slice []string
+		assert.True(t, isNil(slice))
+	})
+
+	t.Run("non-nil slice", func(t *testing.T) {
+		slice := []string{}
+		assert.False(t, isNil(slice))
+	})
+
+	t.Run("nil map", func(t *testing.T) {
+		var m map[string]string
+		assert.True(t, isNil(m))
+	})
+
+	t.Run("non-nil map", func(t *testing.T) {
+		m := make(map[string]string)
+		assert.False(t, isNil(m))
+	})
+
+	t.Run("string value", func(t *testing.T) {
+		assert.False(t, isNil("test"))
+	})
+
+	t.Run("empty string value", func(t *testing.T) {
+		assert.False(t, isNil(""))
+	})
+
+	t.Run("int value", func(t *testing.T) {
+		assert.False(t, isNil(42))
+	})
+
+	t.Run("zero int value", func(t *testing.T) {
+		assert.False(t, isNil(0))
+	})
+
+	t.Run("bool value", func(t *testing.T) {
+		assert.False(t, isNil(true))
+	})
+
+	t.Run("false bool value", func(t *testing.T) {
+		assert.False(t, isNil(false))
+	})
+
+	t.Run("struct value", func(t *testing.T) {
+		type testStruct struct {
+			Field string
+		}
+		assert.False(t, isNil(testStruct{Field: "test"}))
+	})
+
+	t.Run("empty struct value", func(t *testing.T) {
+		type testStruct struct {
+			Field string
+		}
+		assert.False(t, isNil(testStruct{}))
+	})
 }
 
 // newTestErrorDecoder returns an error decoder suitable for tests.
