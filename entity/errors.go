@@ -1,0 +1,130 @@
+// Code generated from our API definition. DO NOT EDIT.
+
+package entity
+
+import (
+	json "encoding/json"
+	core "github.com/anduril/lattice-sdk-go/v5/core"
+)
+
+// Bad request or invalid request
+type BadRequestError struct {
+	*core.APIError
+	Body interface{}
+}
+
+func (b *BadRequestError) UnmarshalJSON(data []byte) error {
+	var body interface{}
+	if err := json.Unmarshal(data, &body); err != nil {
+		return err
+	}
+	b.StatusCode = 400
+	b.Body = body
+	return nil
+}
+
+func (b *BadRequestError) MarshalJSON() ([]byte, error) {
+	return json.Marshal(b.Body)
+}
+
+func (b *BadRequestError) Unwrap() error {
+	return b.APIError
+}
+
+// The specified resource was not found
+type NotFoundError struct {
+	*core.APIError
+	Body interface{}
+}
+
+func (n *NotFoundError) UnmarshalJSON(data []byte) error {
+	var body interface{}
+	if err := json.Unmarshal(data, &body); err != nil {
+		return err
+	}
+	n.StatusCode = 404
+	n.Body = body
+	return nil
+}
+
+func (n *NotFoundError) MarshalJSON() ([]byte, error) {
+	return json.Marshal(n.Body)
+}
+
+func (n *NotFoundError) Unwrap() error {
+	return n.APIError
+}
+
+// The server has terminated the session. The server will send this error when the client has fallen too far
+// behind in processing entity events. If the server sends this error, then the session token is invalid and a
+// new session must be initiated to receive entity events.
+type RequestTimeoutError struct {
+	*core.APIError
+	Body *Error
+}
+
+func (r *RequestTimeoutError) UnmarshalJSON(data []byte) error {
+	var body *Error
+	if err := json.Unmarshal(data, &body); err != nil {
+		return err
+	}
+	r.StatusCode = 408
+	r.Body = body
+	return nil
+}
+
+func (r *RequestTimeoutError) MarshalJSON() ([]byte, error) {
+	return json.Marshal(r.Body)
+}
+
+func (r *RequestTimeoutError) Unwrap() error {
+	return r.APIError
+}
+
+// Server is out of resources or reaching rate limiting or quota and cannot accept the request at this time.
+type TooManyRequestsError struct {
+	*core.APIError
+	Body *Error
+}
+
+func (t *TooManyRequestsError) UnmarshalJSON(data []byte) error {
+	var body *Error
+	if err := json.Unmarshal(data, &body); err != nil {
+		return err
+	}
+	t.StatusCode = 429
+	t.Body = body
+	return nil
+}
+
+func (t *TooManyRequestsError) MarshalJSON() ([]byte, error) {
+	return json.Marshal(t.Body)
+}
+
+func (t *TooManyRequestsError) Unwrap() error {
+	return t.APIError
+}
+
+// Unauthorized - client authentication failed
+type UnauthorizedError struct {
+	*core.APIError
+	Body interface{}
+}
+
+func (u *UnauthorizedError) UnmarshalJSON(data []byte) error {
+	var body interface{}
+	if err := json.Unmarshal(data, &body); err != nil {
+		return err
+	}
+	u.StatusCode = 401
+	u.Body = body
+	return nil
+}
+
+func (u *UnauthorizedError) MarshalJSON() ([]byte, error) {
+	return json.Marshal(u.Body)
+}
+
+func (u *UnauthorizedError) Unwrap() error {
+	return u.APIError
+}

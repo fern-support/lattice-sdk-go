@@ -6,24 +6,17 @@ import (
 	bytes "bytes"
 	context "context"
 	json "encoding/json"
-	Lattice "github.com/anduril/lattice-sdk-go/v4"
-	client "github.com/anduril/lattice-sdk-go/v4/client"
-	option "github.com/anduril/lattice-sdk-go/v4/option"
+	Lattice "github.com/anduril/lattice-sdk-go/v5"
+	client "github.com/anduril/lattice-sdk-go/v5/client"
+	option "github.com/anduril/lattice-sdk-go/v5/option"
 	require "github.com/stretchr/testify/require"
 	http "net/http"
 	testing "testing"
 )
 
-func ResetWireMockRequests(
-	t *testing.T,
-) {
-	WiremockAdminURL := "http://localhost:8080/__admin"
-	_, err := http.Post(WiremockAdminURL+"/requests/reset", "application/json", nil)
-	require.NoError(t, err)
-}
-
 func VerifyRequestCount(
 	t *testing.T,
+	testId string,
 	method string,
 	urlPath string,
 	queryParams map[string]string,
@@ -35,7 +28,9 @@ func VerifyRequestCount(
 	reqBody.WriteString(method)
 	reqBody.WriteString(`","urlPath":"`)
 	reqBody.WriteString(urlPath)
-	reqBody.WriteString(`"}`)
+	reqBody.WriteString(`","headers":{"X-Test-Id":{"equalTo":"`)
+	reqBody.WriteString(testId)
+	reqBody.WriteString(`"}}`)
 	if len(queryParams) > 0 {
 		reqBody.WriteString(`,"queryParameters":{`)
 		first := true
@@ -52,6 +47,7 @@ func VerifyRequestCount(
 		}
 		reqBody.WriteString("}")
 	}
+	reqBody.WriteString("}")
 	resp, err := http.Post(WiremockAdminURL+"/requests/find", "application/json", &reqBody)
 	require.NoError(t, err)
 	var result struct {
@@ -64,7 +60,6 @@ func VerifyRequestCount(
 func TestObjectsListObjectsWithWireMock(
 	t *testing.T,
 ) {
-	ResetWireMockRequests(t)
 	WireMockBaseURL := "http://localhost:8080"
 	client := client.NewClient(
 		option.WithBaseURL(
@@ -75,16 +70,18 @@ func TestObjectsListObjectsWithWireMock(
 	_, invocationErr := client.Objects.ListObjects(
 		context.TODO(),
 		request,
+		option.WithHTTPHeader(
+			http.Header{"X-Test-Id": []string{"TestObjectsListObjectsWithWireMock"}},
+		),
 	)
 
 	require.NoError(t, invocationErr, "Client method call should succeed")
-	VerifyRequestCount(t, "GET", "/api/v1/objects", nil, 1)
+	VerifyRequestCount(t, "TestObjectsListObjectsWithWireMock", "GET", "/api/v1/objects", nil, 1)
 }
 
 func TestObjectsGetObjectWithWireMock(
 	t *testing.T,
 ) {
-	ResetWireMockRequests(t)
 	WireMockBaseURL := "http://localhost:8080"
 	client := client.NewClient(
 		option.WithBaseURL(
@@ -97,16 +94,18 @@ func TestObjectsGetObjectWithWireMock(
 	_, invocationErr := client.Objects.GetObject(
 		context.TODO(),
 		request,
+		option.WithHTTPHeader(
+			http.Header{"X-Test-Id": []string{"TestObjectsGetObjectWithWireMock"}},
+		),
 	)
 
 	require.NoError(t, invocationErr, "Client method call should succeed")
-	VerifyRequestCount(t, "GET", "/api/v1/objects/objectPath", nil, 1)
+	VerifyRequestCount(t, "TestObjectsGetObjectWithWireMock", "GET", "/api/v1/objects/objectPath", nil, 1)
 }
 
 func TestObjectsDeleteObjectWithWireMock(
 	t *testing.T,
 ) {
-	ResetWireMockRequests(t)
 	WireMockBaseURL := "http://localhost:8080"
 	client := client.NewClient(
 		option.WithBaseURL(
@@ -119,16 +118,18 @@ func TestObjectsDeleteObjectWithWireMock(
 	invocationErr := client.Objects.DeleteObject(
 		context.TODO(),
 		request,
+		option.WithHTTPHeader(
+			http.Header{"X-Test-Id": []string{"TestObjectsDeleteObjectWithWireMock"}},
+		),
 	)
 
 	require.NoError(t, invocationErr, "Client method call should succeed")
-	VerifyRequestCount(t, "DELETE", "/api/v1/objects/objectPath", nil, 1)
+	VerifyRequestCount(t, "TestObjectsDeleteObjectWithWireMock", "DELETE", "/api/v1/objects/objectPath", nil, 1)
 }
 
 func TestObjectsGetObjectMetadataWithWireMock(
 	t *testing.T,
 ) {
-	ResetWireMockRequests(t)
 	WireMockBaseURL := "http://localhost:8080"
 	client := client.NewClient(
 		option.WithBaseURL(
@@ -141,8 +142,11 @@ func TestObjectsGetObjectMetadataWithWireMock(
 	invocationErr := client.Objects.GetObjectMetadata(
 		context.TODO(),
 		request,
+		option.WithHTTPHeader(
+			http.Header{"X-Test-Id": []string{"TestObjectsGetObjectMetadataWithWireMock"}},
+		),
 	)
 
 	require.NoError(t, invocationErr, "Client method call should succeed")
-	VerifyRequestCount(t, "HEAD", "/api/v1/objects/objectPath", nil, 1)
+	VerifyRequestCount(t, "TestObjectsGetObjectMetadataWithWireMock", "HEAD", "/api/v1/objects/objectPath", nil, 1)
 }

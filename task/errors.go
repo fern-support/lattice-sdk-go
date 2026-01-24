@@ -1,6 +1,6 @@
 // Code generated from our API definition. DO NOT EDIT.
 
-package Lattice
+package task
 
 import (
 	json "encoding/json"
@@ -29,78 +29,6 @@ func (b *BadRequestError) MarshalJSON() ([]byte, error) {
 
 func (b *BadRequestError) Unwrap() error {
 	return b.APIError
-}
-
-// Content too large
-type ContentTooLargeError struct {
-	*core.APIError
-	Body interface{}
-}
-
-func (c *ContentTooLargeError) UnmarshalJSON(data []byte) error {
-	var body interface{}
-	if err := json.Unmarshal(data, &body); err != nil {
-		return err
-	}
-	c.StatusCode = 413
-	c.Body = body
-	return nil
-}
-
-func (c *ContentTooLargeError) MarshalJSON() ([]byte, error) {
-	return json.Marshal(c.Body)
-}
-
-func (c *ContentTooLargeError) Unwrap() error {
-	return c.APIError
-}
-
-// Insuccifient Storage
-type InsufficientStorageError struct {
-	*core.APIError
-	Body interface{}
-}
-
-func (i *InsufficientStorageError) UnmarshalJSON(data []byte) error {
-	var body interface{}
-	if err := json.Unmarshal(data, &body); err != nil {
-		return err
-	}
-	i.StatusCode = 507
-	i.Body = body
-	return nil
-}
-
-func (i *InsufficientStorageError) MarshalJSON() ([]byte, error) {
-	return json.Marshal(i.Body)
-}
-
-func (i *InsufficientStorageError) Unwrap() error {
-	return i.APIError
-}
-
-// Internal server error
-type InternalServerError struct {
-	*core.APIError
-	Body interface{}
-}
-
-func (i *InternalServerError) UnmarshalJSON(data []byte) error {
-	var body interface{}
-	if err := json.Unmarshal(data, &body); err != nil {
-		return err
-	}
-	i.StatusCode = 500
-	i.Body = body
-	return nil
-}
-
-func (i *InternalServerError) MarshalJSON() ([]byte, error) {
-	return json.Marshal(i.Body)
-}
-
-func (i *InternalServerError) Unwrap() error {
-	return i.APIError
 }
 
 // The specified resource was not found

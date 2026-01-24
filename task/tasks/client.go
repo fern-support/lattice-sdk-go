@@ -4,10 +4,10 @@ package tasks
 
 import (
 	context "context"
-	Lattice "github.com/anduril/lattice-sdk-go/v4"
-	core "github.com/anduril/lattice-sdk-go/v4/core"
-	internal "github.com/anduril/lattice-sdk-go/v4/internal"
-	option "github.com/anduril/lattice-sdk-go/v4/option"
+	core "github.com/anduril/lattice-sdk-go/v5/core"
+	internal "github.com/anduril/lattice-sdk-go/v5/internal"
+	option "github.com/anduril/lattice-sdk-go/v5/option"
+	task "github.com/anduril/lattice-sdk-go/v5/task"
 )
 
 type Client struct {
@@ -42,9 +42,9 @@ func NewClient(options *core.RequestOptions) *Client {
 // through other Tasks API endpoints.
 func (c *Client) CreateTask(
 	ctx context.Context,
-	request *Lattice.TaskCreation,
+	request *task.TaskCreation,
 	opts ...option.RequestOption,
-) (*Lattice.Task, error) {
+) (*task.Task, error) {
 	response, err := c.WithRawResponse.CreateTask(
 		ctx,
 		request,
@@ -66,9 +66,9 @@ func (c *Client) CreateTask(
 // perspective.
 func (c *Client) GetTask(
 	ctx context.Context,
-	request *Lattice.GetTaskRequest,
+	request *task.GetTaskRequest,
 	opts ...option.RequestOption,
-) (*Lattice.Task, error) {
+) (*task.Task, error) {
 	response, err := c.WithRawResponse.GetTask(
 		ctx,
 		request,
@@ -93,9 +93,9 @@ func (c *Client) GetTask(
 // reaches these states, no further updates are allowed.
 func (c *Client) UpdateTaskStatus(
 	ctx context.Context,
-	request *Lattice.TaskStatusUpdate,
+	request *task.TaskStatusUpdate,
 	opts ...option.RequestOption,
-) (*Lattice.Task, error) {
+) (*task.Task, error) {
 	response, err := c.WithRawResponse.UpdateTaskStatus(
 		ctx,
 		request,
@@ -124,9 +124,9 @@ func (c *Client) UpdateTaskStatus(
 // By default, this returns the latest task version for each matching task from the manager's perspective.
 func (c *Client) QueryTasks(
 	ctx context.Context,
-	request *Lattice.TaskQuery,
+	request *task.TaskQuery,
 	opts ...option.RequestOption,
-) (*Lattice.TaskQueryResults, error) {
+) (*task.TaskQueryResults, error) {
 	response, err := c.WithRawResponse.QueryTasks(
 		ctx,
 		request,
@@ -160,9 +160,9 @@ func (c *Client) QueryTasks(
 // period you will be expected to reinitiate a new request.
 func (c *Client) ListenAsAgent(
 	ctx context.Context,
-	request *Lattice.AgentListener,
+	request *task.AgentListener,
 	opts ...option.RequestOption,
-) (*Lattice.AgentRequest, error) {
+) (*task.AgentRequest, error) {
 	response, err := c.WithRawResponse.ListenAsAgent(
 		ctx,
 		request,

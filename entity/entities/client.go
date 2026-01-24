@@ -4,10 +4,10 @@ package entities
 
 import (
 	context "context"
-	Lattice "github.com/anduril/lattice-sdk-go/v4"
-	core "github.com/anduril/lattice-sdk-go/v4/core"
-	internal "github.com/anduril/lattice-sdk-go/v4/internal"
-	option "github.com/anduril/lattice-sdk-go/v4/option"
+	core "github.com/anduril/lattice-sdk-go/v5/core"
+	entity "github.com/anduril/lattice-sdk-go/v5/entity"
+	internal "github.com/anduril/lattice-sdk-go/v5/internal"
+	option "github.com/anduril/lattice-sdk-go/v5/option"
 	http "net/http"
 )
 
@@ -42,9 +42,9 @@ func NewClient(options *core.RequestOptions) *Client {
 // provenance.sourceUpdateTime is greater than the provenance.sourceUpdateTime of the existing entity.
 func (c *Client) PublishEntity(
 	ctx context.Context,
-	request *Lattice.Entity,
+	request *entity.Entity,
 	opts ...option.RequestOption,
-) (*Lattice.Entity, error) {
+) (*entity.Entity, error) {
 	response, err := c.WithRawResponse.PublishEntity(
 		ctx,
 		request,
@@ -58,9 +58,9 @@ func (c *Client) PublishEntity(
 
 func (c *Client) GetEntity(
 	ctx context.Context,
-	request *Lattice.GetEntityRequest,
+	request *entity.GetEntityRequest,
 	opts ...option.RequestOption,
-) (*Lattice.Entity, error) {
+) (*entity.Entity, error) {
 	response, err := c.WithRawResponse.GetEntity(
 		ctx,
 		request,
@@ -81,9 +81,9 @@ func (c *Client) GetEntity(
 // concurrently for the same field path, the last writer wins.
 func (c *Client) OverrideEntity(
 	ctx context.Context,
-	request *Lattice.EntityOverride,
+	request *entity.EntityOverride,
 	opts ...option.RequestOption,
-) (*Lattice.Entity, error) {
+) (*entity.Entity, error) {
 	response, err := c.WithRawResponse.OverrideEntity(
 		ctx,
 		request,
@@ -98,9 +98,9 @@ func (c *Client) OverrideEntity(
 // This operation clears the override value from the specified field path on the entity.
 func (c *Client) RemoveEntityOverride(
 	ctx context.Context,
-	request *Lattice.RemoveEntityOverrideRequest,
+	request *entity.RemoveEntityOverrideRequest,
 	opts ...option.RequestOption,
-) (*Lattice.Entity, error) {
+) (*entity.Entity, error) {
 	response, err := c.WithRawResponse.RemoveEntityOverride(
 		ctx,
 		request,
@@ -123,9 +123,9 @@ func (c *Client) RemoveEntityOverride(
 // In this case you must start a new session by sending a request with an empty session token.
 func (c *Client) LongPollEntityEvents(
 	ctx context.Context,
-	request *Lattice.EntityEventRequest,
+	request *entity.EntityEventRequest,
 	opts ...option.RequestOption,
-) (*Lattice.EntityEventResponse, error) {
+) (*entity.EntityEventResponse, error) {
 	response, err := c.WithRawResponse.LongPollEntityEvents(
 		ctx,
 		request,
@@ -158,9 +158,9 @@ func (c *Client) LongPollEntityEvents(
 // this provides real-time updates with minimal latency and reduced server load.
 func (c *Client) StreamEntities(
 	ctx context.Context,
-	request *Lattice.EntityStreamRequest,
+	request *entity.EntityStreamRequest,
 	opts ...option.RequestOption,
-) (*core.Stream[Lattice.StreamEntitiesResponse], error) {
+) (*core.Stream[entity.StreamEntitiesResponse], error) {
 	options := core.NewRequestOptions(opts...)
 	baseURL := internal.ResolveBaseURL(
 		options.BaseURL,
@@ -174,7 +174,7 @@ func (c *Client) StreamEntities(
 	)
 	headers.Add("Accept", "text/event-stream")
 	headers.Add("Content-Type", "application/json")
-	streamer := internal.NewStreamer[Lattice.StreamEntitiesResponse](c.caller)
+	streamer := internal.NewStreamer[entity.StreamEntitiesResponse](c.caller)
 	return streamer.Stream(
 		ctx,
 		&internal.StreamParams{
@@ -189,7 +189,7 @@ func (c *Client) StreamEntities(
 			Terminator:      internal.DefaultSSETerminator,
 			Format:          core.StreamFormatSSE,
 			Request:         request,
-			ErrorDecoder:    internal.NewErrorDecoder(Lattice.ErrorCodes),
+			ErrorDecoder:    internal.NewErrorDecoder(entity.ErrorCodes),
 		},
 	)
 }
