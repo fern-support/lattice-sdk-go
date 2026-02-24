@@ -1,4 +1,128 @@
 # Reference
+## OAuth2
+<details><summary><code>client.OAuth2.GetToken(request) -> *Lattice.GetTokenResponse</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Exchange authorization code, refresh token, client credentials, or resource owner credentials for an access token
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```go
+request := &Lattice.GetTokenRequest{}
+client.OAuth2.GetToken(
+        context.TODO(),
+        request,
+    )
+}
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**grantType:** `string` — The type of grant being requested
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**code:** `*string` — The authorization code (required for authorization_code grant type)
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**redirectURI:** `*string` — The redirect URI (required for authorization_code grant type)
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**clientID:** `*string` — The client identifier
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**clientSecret:** `*string` — The client secret
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**refreshToken:** `*string` — The refresh token (required for refresh_token grant type)
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**username:** `*string` — The resource owner username (required for password grant type)
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**password:** `*string` — The resource owner password (required for password grant type)
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**scope:** `*string` — The scope of the access request
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
 ## Entities
 <details><summary><code>client.Entities.PublishEntity(request) -> *Lattice.Entity</code></summary>
 <dl>
@@ -1006,6 +1130,14 @@ client.Objects.ListObjects(
     
 </dd>
 </dl>
+
+<dl>
+<dd>
+
+**maxPageSize:** `*int` — Sets the maximum number of items that should be returned on a single page.
+    
+</dd>
+</dl>
 </dd>
 </dl>
 
@@ -1080,6 +1212,65 @@ client.Objects.GetObject(
 <dd>
 
 **priority:** `*string` — Indicates a client's preference for the priority of the response. The value is a structured header as defined in RFC 9218. If you do not set the header, Lattice uses the default priority set for the environment. Incremental delivery directives are not supported and will be ignored.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.Objects.UploadObject(ObjectPath, request) -> *Lattice.PathMetadata</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Uploads an object. The object must be 1 GiB or smaller.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```go
+client.Objects.UploadObject(
+        context.TODO(),
+        "",
+        nil,
+    )
+}
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**objectPath:** `string` — Path of the Object that is to be uploaded.
     
 </dd>
 </dl>
