@@ -34,6 +34,8 @@ func NewRawClient(options *core.RequestOptions) *RawClient {
 
 func (r *RawClient) GetObject(
 	ctx context.Context,
+	// The path of the object to fetch.
+	objectPath string,
 	request *Lattice.GetObjectRequest,
 	opts ...option.RequestOption,
 ) (*core.Response[io.Reader], error) {
@@ -45,7 +47,7 @@ func (r *RawClient) GetObject(
 	)
 	endpointURL := internal.EncodeURL(
 		baseURL+"/api/v1/objects/%v",
-		request.ObjectPath,
+		objectPath,
 	)
 	headers := internal.MergeHeaders(
 		r.options.ToHeader(),
@@ -132,7 +134,8 @@ func (r *RawClient) UploadObject(
 
 func (r *RawClient) DeleteObject(
 	ctx context.Context,
-	request *Lattice.DeleteObjectRequest,
+	// The path of the object to delete.
+	objectPath string,
 	opts ...option.RequestOption,
 ) (*core.Response[any], error) {
 	options := core.NewRequestOptions(opts...)
@@ -143,7 +146,7 @@ func (r *RawClient) DeleteObject(
 	)
 	endpointURL := internal.EncodeURL(
 		baseURL+"/api/v1/objects/%v",
-		request.ObjectPath,
+		objectPath,
 	)
 	headers := internal.MergeHeaders(
 		r.options.ToHeader(),
@@ -174,7 +177,8 @@ func (r *RawClient) DeleteObject(
 
 func (r *RawClient) GetObjectMetadata(
 	ctx context.Context,
-	request *Lattice.GetObjectMetadataRequest,
+	// The path of the object to query.
+	objectPath string,
 	opts ...option.RequestOption,
 ) (*core.Response[any], error) {
 	options := core.NewRequestOptions(opts...)
@@ -185,7 +189,7 @@ func (r *RawClient) GetObjectMetadata(
 	)
 	endpointURL := internal.EncodeURL(
 		baseURL+"/api/v1/objects/%v",
-		request.ObjectPath,
+		objectPath,
 	)
 	headers := internal.MergeHeaders(
 		r.options.ToHeader(),

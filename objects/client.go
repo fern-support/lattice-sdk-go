@@ -97,11 +97,14 @@ func (c *Client) ListObjects(
 // Fetches an object from your environment using the objectPath path parameter.
 func (c *Client) GetObject(
 	ctx context.Context,
+	// The path of the object to fetch.
+	objectPath string,
 	request *Lattice.GetObjectRequest,
 	opts ...option.RequestOption,
 ) (io.Reader, error) {
 	response, err := c.WithRawResponse.GetObject(
 		ctx,
+		objectPath,
 		request,
 		opts...,
 	)
@@ -134,12 +137,13 @@ func (c *Client) UploadObject(
 // Deletes an object from your environment given the objectPath path parameter.
 func (c *Client) DeleteObject(
 	ctx context.Context,
-	request *Lattice.DeleteObjectRequest,
+	// The path of the object to delete.
+	objectPath string,
 	opts ...option.RequestOption,
 ) error {
 	_, err := c.WithRawResponse.DeleteObject(
 		ctx,
-		request,
+		objectPath,
 		opts...,
 	)
 	if err != nil {
@@ -151,12 +155,13 @@ func (c *Client) DeleteObject(
 // Returns metadata for a specified object path. Use this to fetch metadata such as object size (size_bytes), its expiry time (expiry_time), or its latest update timestamp (last_updated_at).
 func (c *Client) GetObjectMetadata(
 	ctx context.Context,
-	request *Lattice.GetObjectMetadataRequest,
+	// The path of the object to query.
+	objectPath string,
 	opts ...option.RequestOption,
 ) error {
 	_, err := c.WithRawResponse.GetObjectMetadata(
 		ctx,
-		request,
+		objectPath,
 		opts...,
 	)
 	if err != nil {
