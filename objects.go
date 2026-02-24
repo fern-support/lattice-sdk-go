@@ -11,35 +11,8 @@ import (
 )
 
 var (
-	deleteObjectRequestFieldObjectPath = big.NewInt(1 << 0)
-)
-
-type DeleteObjectRequest struct {
-	// The path of the object to delete.
-	ObjectPath string `json:"-" url:"-"`
-
-	// Private bitmask of fields set to an explicit value and therefore not to be omitted
-	explicitFields *big.Int `json:"-" url:"-"`
-}
-
-func (d *DeleteObjectRequest) require(field *big.Int) {
-	if d.explicitFields == nil {
-		d.explicitFields = big.NewInt(0)
-	}
-	d.explicitFields.Or(d.explicitFields, field)
-}
-
-// SetObjectPath sets the ObjectPath field and marks it as non-optional;
-// this prevents an empty or null value for this field from being omitted during serialization.
-func (d *DeleteObjectRequest) SetObjectPath(objectPath string) {
-	d.ObjectPath = objectPath
-	d.require(deleteObjectRequestFieldObjectPath)
-}
-
-var (
 	getObjectRequestFieldAcceptEncoding = big.NewInt(1 << 0)
 	getObjectRequestFieldPriority       = big.NewInt(1 << 1)
-	getObjectRequestFieldObjectPath     = big.NewInt(1 << 2)
 )
 
 type GetObjectRequest struct {
@@ -47,8 +20,6 @@ type GetObjectRequest struct {
 	AcceptEncoding *GetObjectRequestAcceptEncoding `json:"-" url:"-"`
 	// Indicates a client's preference for the priority of the response. The value is a structured header as defined in RFC 9218. If you do not set the header, Lattice uses the default priority set for the environment. Incremental delivery directives are not supported and will be ignored.
 	Priority *string `json:"-" url:"-"`
-	// The path of the object to fetch.
-	ObjectPath string `json:"-" url:"-"`
 
 	// Private bitmask of fields set to an explicit value and therefore not to be omitted
 	explicitFields *big.Int `json:"-" url:"-"`
@@ -75,44 +46,12 @@ func (g *GetObjectRequest) SetPriority(priority *string) {
 	g.require(getObjectRequestFieldPriority)
 }
 
-// SetObjectPath sets the ObjectPath field and marks it as non-optional;
-// this prevents an empty or null value for this field from being omitted during serialization.
-func (g *GetObjectRequest) SetObjectPath(objectPath string) {
-	g.ObjectPath = objectPath
-	g.require(getObjectRequestFieldObjectPath)
-}
-
-var (
-	getObjectMetadataRequestFieldObjectPath = big.NewInt(1 << 0)
-)
-
-type GetObjectMetadataRequest struct {
-	// The path of the object to query.
-	ObjectPath string `json:"-" url:"-"`
-
-	// Private bitmask of fields set to an explicit value and therefore not to be omitted
-	explicitFields *big.Int `json:"-" url:"-"`
-}
-
-func (g *GetObjectMetadataRequest) require(field *big.Int) {
-	if g.explicitFields == nil {
-		g.explicitFields = big.NewInt(0)
-	}
-	g.explicitFields.Or(g.explicitFields, field)
-}
-
-// SetObjectPath sets the ObjectPath field and marks it as non-optional;
-// this prevents an empty or null value for this field from being omitted during serialization.
-func (g *GetObjectMetadataRequest) SetObjectPath(objectPath string) {
-	g.ObjectPath = objectPath
-	g.require(getObjectMetadataRequestFieldObjectPath)
-}
-
 var (
 	listObjectsRequestFieldPrefix           = big.NewInt(1 << 0)
 	listObjectsRequestFieldSinceTimestamp   = big.NewInt(1 << 1)
 	listObjectsRequestFieldPageToken        = big.NewInt(1 << 2)
 	listObjectsRequestFieldAllObjectsInMesh = big.NewInt(1 << 3)
+	listObjectsRequestFieldMaxPageSize      = big.NewInt(1 << 4)
 )
 
 type ListObjectsRequest struct {
@@ -124,6 +63,8 @@ type ListObjectsRequest struct {
 	PageToken *string `json:"-" url:"pageToken,omitempty"`
 	// Lists objects across all environment nodes in a Lattice Mesh.
 	AllObjectsInMesh *bool `json:"-" url:"allObjectsInMesh,omitempty"`
+	// Sets the maximum number of items that should be returned on a single page.
+	MaxPageSize *int `json:"-" url:"maxPageSize,omitempty"`
 
 	// Private bitmask of fields set to an explicit value and therefore not to be omitted
 	explicitFields *big.Int `json:"-" url:"-"`
@@ -164,6 +105,13 @@ func (l *ListObjectsRequest) SetAllObjectsInMesh(allObjectsInMesh *bool) {
 	l.require(listObjectsRequestFieldAllObjectsInMesh)
 }
 
+// SetMaxPageSize sets the MaxPageSize field and marks it as non-optional;
+// this prevents an empty or null value for this field from being omitted during serialization.
+func (l *ListObjectsRequest) SetMaxPageSize(maxPageSize *int) {
+	l.MaxPageSize = maxPageSize
+	l.require(listObjectsRequestFieldMaxPageSize)
+}
+
 var (
 	contentIdentifierFieldPath     = big.NewInt(1 << 0)
 	contentIdentifierFieldChecksum = big.NewInt(1 << 1)
@@ -201,6 +149,9 @@ func (c *ContentIdentifier) GetChecksum() string {
 }
 
 func (c *ContentIdentifier) GetExtraProperties() map[string]interface{} {
+	if c == nil {
+		return nil
+	}
 	return c.extraProperties
 }
 
@@ -253,6 +204,9 @@ func (c *ContentIdentifier) MarshalJSON() ([]byte, error) {
 }
 
 func (c *ContentIdentifier) String() string {
+	if c == nil {
+		return "<nil>"
+	}
 	if len(c.rawJSON) > 0 {
 		if value, err := internal.StringifyJSON(c.rawJSON); err == nil {
 			return value
@@ -295,6 +249,9 @@ func (l *ListResponse) GetNextPageToken() *string {
 }
 
 func (l *ListResponse) GetExtraProperties() map[string]interface{} {
+	if l == nil {
+		return nil
+	}
 	return l.extraProperties
 }
 
@@ -347,6 +304,9 @@ func (l *ListResponse) MarshalJSON() ([]byte, error) {
 }
 
 func (l *ListResponse) String() string {
+	if l == nil {
+		return "<nil>"
+	}
 	if len(l.rawJSON) > 0 {
 		if value, err := internal.StringifyJSON(l.rawJSON); err == nil {
 			return value
@@ -407,6 +367,9 @@ func (p *PathMetadata) GetExpiryTime() *time.Time {
 }
 
 func (p *PathMetadata) GetExtraProperties() map[string]interface{} {
+	if p == nil {
+		return nil
+	}
 	return p.extraProperties
 }
 
@@ -485,6 +448,9 @@ func (p *PathMetadata) MarshalJSON() ([]byte, error) {
 }
 
 func (p *PathMetadata) String() string {
+	if p == nil {
+		return "<nil>"
+	}
 	if len(p.rawJSON) > 0 {
 		if value, err := internal.StringifyJSON(p.rawJSON); err == nil {
 			return value

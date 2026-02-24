@@ -11,32 +11,6 @@ import (
 )
 
 var (
-	getEntityRequestFieldEntityID = big.NewInt(1 << 0)
-)
-
-type GetEntityRequest struct {
-	// ID of the entity to return
-	EntityID string `json:"-" url:"-"`
-
-	// Private bitmask of fields set to an explicit value and therefore not to be omitted
-	explicitFields *big.Int `json:"-" url:"-"`
-}
-
-func (g *GetEntityRequest) require(field *big.Int) {
-	if g.explicitFields == nil {
-		g.explicitFields = big.NewInt(0)
-	}
-	g.explicitFields.Or(g.explicitFields, field)
-}
-
-// SetEntityID sets the EntityID field and marks it as non-optional;
-// this prevents an empty or null value for this field from being omitted during serialization.
-func (g *GetEntityRequest) SetEntityID(entityID string) {
-	g.EntityID = entityID
-	g.require(getEntityRequestFieldEntityID)
-}
-
-var (
 	entityEventRequestFieldSessionToken = big.NewInt(1 << 0)
 	entityEventRequestFieldBatchSize    = big.NewInt(1 << 1)
 )
@@ -72,18 +46,33 @@ func (e *EntityEventRequest) SetBatchSize(batchSize *int) {
 	e.require(entityEventRequestFieldBatchSize)
 }
 
+func (e *EntityEventRequest) UnmarshalJSON(data []byte) error {
+	type unmarshaler EntityEventRequest
+	var body unmarshaler
+	if err := json.Unmarshal(data, &body); err != nil {
+		return err
+	}
+	*e = EntityEventRequest(body)
+	return nil
+}
+
+func (e *EntityEventRequest) MarshalJSON() ([]byte, error) {
+	type embed EntityEventRequest
+	var marshaler = struct {
+		embed
+	}{
+		embed: embed(*e),
+	}
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, e.explicitFields)
+	return json.Marshal(explicitMarshaler)
+}
+
 var (
-	entityOverrideFieldEntityID   = big.NewInt(1 << 0)
-	entityOverrideFieldFieldPath  = big.NewInt(1 << 1)
-	entityOverrideFieldEntity     = big.NewInt(1 << 2)
-	entityOverrideFieldProvenance = big.NewInt(1 << 3)
+	entityOverrideFieldEntity     = big.NewInt(1 << 0)
+	entityOverrideFieldProvenance = big.NewInt(1 << 1)
 )
 
 type EntityOverride struct {
-	// The unique ID of the entity to override
-	EntityID string `json:"-" url:"-"`
-	// fieldPath to override
-	FieldPath string `json:"-" url:"-"`
 	// The entity containing the overridden fields. The service will extract the overridable fields from
 	// the object and ignore all other fields.
 	Entity *Entity `json:"entity,omitempty" url:"-"`
@@ -101,20 +90,6 @@ func (e *EntityOverride) require(field *big.Int) {
 	e.explicitFields.Or(e.explicitFields, field)
 }
 
-// SetEntityID sets the EntityID field and marks it as non-optional;
-// this prevents an empty or null value for this field from being omitted during serialization.
-func (e *EntityOverride) SetEntityID(entityID string) {
-	e.EntityID = entityID
-	e.require(entityOverrideFieldEntityID)
-}
-
-// SetFieldPath sets the FieldPath field and marks it as non-optional;
-// this prevents an empty or null value for this field from being omitted during serialization.
-func (e *EntityOverride) SetFieldPath(fieldPath string) {
-	e.FieldPath = fieldPath
-	e.require(entityOverrideFieldFieldPath)
-}
-
 // SetEntity sets the Entity field and marks it as non-optional;
 // this prevents an empty or null value for this field from being omitted during serialization.
 func (e *EntityOverride) SetEntity(entity *Entity) {
@@ -129,40 +104,25 @@ func (e *EntityOverride) SetProvenance(provenance *Provenance) {
 	e.require(entityOverrideFieldProvenance)
 }
 
-var (
-	removeEntityOverrideRequestFieldEntityID  = big.NewInt(1 << 0)
-	removeEntityOverrideRequestFieldFieldPath = big.NewInt(1 << 1)
-)
-
-type RemoveEntityOverrideRequest struct {
-	// The unique ID of the entity to undo an override from.
-	EntityID string `json:"-" url:"-"`
-	// The fieldPath to clear overrides from.
-	FieldPath string `json:"-" url:"-"`
-
-	// Private bitmask of fields set to an explicit value and therefore not to be omitted
-	explicitFields *big.Int `json:"-" url:"-"`
-}
-
-func (r *RemoveEntityOverrideRequest) require(field *big.Int) {
-	if r.explicitFields == nil {
-		r.explicitFields = big.NewInt(0)
+func (e *EntityOverride) UnmarshalJSON(data []byte) error {
+	type unmarshaler EntityOverride
+	var body unmarshaler
+	if err := json.Unmarshal(data, &body); err != nil {
+		return err
 	}
-	r.explicitFields.Or(r.explicitFields, field)
+	*e = EntityOverride(body)
+	return nil
 }
 
-// SetEntityID sets the EntityID field and marks it as non-optional;
-// this prevents an empty or null value for this field from being omitted during serialization.
-func (r *RemoveEntityOverrideRequest) SetEntityID(entityID string) {
-	r.EntityID = entityID
-	r.require(removeEntityOverrideRequestFieldEntityID)
-}
-
-// SetFieldPath sets the FieldPath field and marks it as non-optional;
-// this prevents an empty or null value for this field from being omitted during serialization.
-func (r *RemoveEntityOverrideRequest) SetFieldPath(fieldPath string) {
-	r.FieldPath = fieldPath
-	r.require(removeEntityOverrideRequestFieldFieldPath)
+func (e *EntityOverride) MarshalJSON() ([]byte, error) {
+	type embed EntityOverride
+	var marshaler = struct {
+		embed
+	}{
+		embed: embed(*e),
+	}
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, e.explicitFields)
+	return json.Marshal(explicitMarshaler)
 }
 
 var (
@@ -211,6 +171,27 @@ func (e *EntityStreamRequest) SetComponentsToInclude(componentsToInclude []strin
 	e.require(entityStreamRequestFieldComponentsToInclude)
 }
 
+func (e *EntityStreamRequest) UnmarshalJSON(data []byte) error {
+	type unmarshaler EntityStreamRequest
+	var body unmarshaler
+	if err := json.Unmarshal(data, &body); err != nil {
+		return err
+	}
+	*e = EntityStreamRequest(body)
+	return nil
+}
+
+func (e *EntityStreamRequest) MarshalJSON() ([]byte, error) {
+	type embed EntityStreamRequest
+	var marshaler = struct {
+		embed
+	}{
+		embed: embed(*e),
+	}
+	explicitMarshaler := internal.HandleExplicitFields(marshaler, e.explicitFields)
+	return json.Marshal(explicitMarshaler)
+}
+
 // Event representing some type of entity change.
 var (
 	entityEventFieldEventType = big.NewInt(1 << 0)
@@ -252,6 +233,9 @@ func (e *EntityEvent) GetEntity() *Entity {
 }
 
 func (e *EntityEvent) GetExtraProperties() map[string]interface{} {
+	if e == nil {
+		return nil
+	}
 	return e.extraProperties
 }
 
@@ -319,6 +303,9 @@ func (e *EntityEvent) MarshalJSON() ([]byte, error) {
 }
 
 func (e *EntityEvent) String() string {
+	if e == nil {
+		return "<nil>"
+	}
 	if len(e.rawJSON) > 0 {
 		if value, err := internal.StringifyJSON(e.rawJSON); err == nil {
 			return value
@@ -396,6 +383,9 @@ func (e *EntityEventResponse) GetEntityEvents() []*EntityEvent {
 }
 
 func (e *EntityEventResponse) GetExtraProperties() map[string]interface{} {
+	if e == nil {
+		return nil
+	}
 	return e.extraProperties
 }
 
@@ -448,6 +438,9 @@ func (e *EntityEventResponse) MarshalJSON() ([]byte, error) {
 }
 
 func (e *EntityEventResponse) String() string {
+	if e == nil {
+		return "<nil>"
+	}
 	if len(e.rawJSON) > 0 {
 		if value, err := internal.StringifyJSON(e.rawJSON); err == nil {
 			return value
@@ -499,6 +492,9 @@ func (e *EntityStreamEvent) GetEntity() *Entity {
 }
 
 func (e *EntityStreamEvent) GetExtraProperties() map[string]interface{} {
+	if e == nil {
+		return nil
+	}
 	return e.extraProperties
 }
 
@@ -566,6 +562,9 @@ func (e *EntityStreamEvent) MarshalJSON() ([]byte, error) {
 }
 
 func (e *EntityStreamEvent) String() string {
+	if e == nil {
+		return "<nil>"
+	}
 	if len(e.rawJSON) > 0 {
 		if value, err := internal.StringifyJSON(e.rawJSON); err == nil {
 			return value
@@ -582,8 +581,8 @@ var (
 )
 
 type EntityStreamHeartbeat struct {
-	// timestamp of the heartbeat
-	Timestamp *time.Time `json:"timestamp,omitempty" url:"timestamp,omitempty"`
+	// The timestamp at which the heartbeat message was sent.
+	Timestamp *string `json:"timestamp,omitempty" url:"timestamp,omitempty"`
 
 	// Private bitmask of fields set to an explicit value and therefore not to be omitted
 	explicitFields *big.Int `json:"-" url:"-"`
@@ -592,7 +591,7 @@ type EntityStreamHeartbeat struct {
 	rawJSON         json.RawMessage
 }
 
-func (e *EntityStreamHeartbeat) GetTimestamp() *time.Time {
+func (e *EntityStreamHeartbeat) GetTimestamp() *string {
 	if e == nil {
 		return nil
 	}
@@ -600,6 +599,9 @@ func (e *EntityStreamHeartbeat) GetTimestamp() *time.Time {
 }
 
 func (e *EntityStreamHeartbeat) GetExtraProperties() map[string]interface{} {
+	if e == nil {
+		return nil
+	}
 	return e.extraProperties
 }
 
@@ -612,24 +614,18 @@ func (e *EntityStreamHeartbeat) require(field *big.Int) {
 
 // SetTimestamp sets the Timestamp field and marks it as non-optional;
 // this prevents an empty or null value for this field from being omitted during serialization.
-func (e *EntityStreamHeartbeat) SetTimestamp(timestamp *time.Time) {
+func (e *EntityStreamHeartbeat) SetTimestamp(timestamp *string) {
 	e.Timestamp = timestamp
 	e.require(entityStreamHeartbeatFieldTimestamp)
 }
 
 func (e *EntityStreamHeartbeat) UnmarshalJSON(data []byte) error {
-	type embed EntityStreamHeartbeat
-	var unmarshaler = struct {
-		embed
-		Timestamp *internal.DateTime `json:"timestamp,omitempty"`
-	}{
-		embed: embed(*e),
-	}
-	if err := json.Unmarshal(data, &unmarshaler); err != nil {
+	type unmarshaler EntityStreamHeartbeat
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
 		return err
 	}
-	*e = EntityStreamHeartbeat(unmarshaler.embed)
-	e.Timestamp = unmarshaler.Timestamp.TimePtr()
+	*e = EntityStreamHeartbeat(value)
 	extraProperties, err := internal.ExtractExtraProperties(data, *e)
 	if err != nil {
 		return err
@@ -643,16 +639,17 @@ func (e *EntityStreamHeartbeat) MarshalJSON() ([]byte, error) {
 	type embed EntityStreamHeartbeat
 	var marshaler = struct {
 		embed
-		Timestamp *internal.DateTime `json:"timestamp,omitempty"`
 	}{
-		embed:     embed(*e),
-		Timestamp: internal.NewOptionalDateTime(e.Timestamp),
+		embed: embed(*e),
 	}
 	explicitMarshaler := internal.HandleExplicitFields(marshaler, e.explicitFields)
 	return json.Marshal(explicitMarshaler)
 }
 
 func (e *EntityStreamHeartbeat) String() string {
+	if e == nil {
+		return "<nil>"
+	}
 	if len(e.rawJSON) > 0 {
 		if value, err := internal.StringifyJSON(e.rawJSON); err == nil {
 			return value
@@ -662,93 +659,6 @@ func (e *EntityStreamHeartbeat) String() string {
 		return value
 	}
 	return fmt.Sprintf("%#v", e)
-}
-
-var (
-	heartbeatObjectFieldTimestamp = big.NewInt(1 << 0)
-)
-
-type HeartbeatObject struct {
-	// timestamp of the heartbeat
-	Timestamp *time.Time `json:"timestamp,omitempty" url:"timestamp,omitempty"`
-
-	// Private bitmask of fields set to an explicit value and therefore not to be omitted
-	explicitFields *big.Int `json:"-" url:"-"`
-
-	extraProperties map[string]interface{}
-	rawJSON         json.RawMessage
-}
-
-func (h *HeartbeatObject) GetTimestamp() *time.Time {
-	if h == nil {
-		return nil
-	}
-	return h.Timestamp
-}
-
-func (h *HeartbeatObject) GetExtraProperties() map[string]interface{} {
-	return h.extraProperties
-}
-
-func (h *HeartbeatObject) require(field *big.Int) {
-	if h.explicitFields == nil {
-		h.explicitFields = big.NewInt(0)
-	}
-	h.explicitFields.Or(h.explicitFields, field)
-}
-
-// SetTimestamp sets the Timestamp field and marks it as non-optional;
-// this prevents an empty or null value for this field from being omitted during serialization.
-func (h *HeartbeatObject) SetTimestamp(timestamp *time.Time) {
-	h.Timestamp = timestamp
-	h.require(heartbeatObjectFieldTimestamp)
-}
-
-func (h *HeartbeatObject) UnmarshalJSON(data []byte) error {
-	type embed HeartbeatObject
-	var unmarshaler = struct {
-		embed
-		Timestamp *internal.DateTime `json:"timestamp,omitempty"`
-	}{
-		embed: embed(*h),
-	}
-	if err := json.Unmarshal(data, &unmarshaler); err != nil {
-		return err
-	}
-	*h = HeartbeatObject(unmarshaler.embed)
-	h.Timestamp = unmarshaler.Timestamp.TimePtr()
-	extraProperties, err := internal.ExtractExtraProperties(data, *h)
-	if err != nil {
-		return err
-	}
-	h.extraProperties = extraProperties
-	h.rawJSON = json.RawMessage(data)
-	return nil
-}
-
-func (h *HeartbeatObject) MarshalJSON() ([]byte, error) {
-	type embed HeartbeatObject
-	var marshaler = struct {
-		embed
-		Timestamp *internal.DateTime `json:"timestamp,omitempty"`
-	}{
-		embed:     embed(*h),
-		Timestamp: internal.NewOptionalDateTime(h.Timestamp),
-	}
-	explicitMarshaler := internal.HandleExplicitFields(marshaler, h.explicitFields)
-	return json.Marshal(explicitMarshaler)
-}
-
-func (h *HeartbeatObject) String() string {
-	if len(h.rawJSON) > 0 {
-		if value, err := internal.StringifyJSON(h.rawJSON); err == nil {
-			return value
-		}
-	}
-	if value, err := internal.StringifyJSON(h); err == nil {
-		return value
-	}
-	return fmt.Sprintf("%#v", h)
 }
 
 // The stream event response.

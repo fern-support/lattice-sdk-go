@@ -58,12 +58,13 @@ func (c *Client) PublishEntity(
 
 func (c *Client) GetEntity(
 	ctx context.Context,
-	request *Lattice.GetEntityRequest,
+	// ID of the entity to return
+	entityID string,
 	opts ...option.RequestOption,
 ) (*Lattice.Entity, error) {
 	response, err := c.WithRawResponse.GetEntity(
 		ctx,
-		request,
+		entityID,
 		opts...,
 	)
 	if err != nil {
@@ -81,11 +82,17 @@ func (c *Client) GetEntity(
 // concurrently for the same field path, the last writer wins.
 func (c *Client) OverrideEntity(
 	ctx context.Context,
+	// The unique ID of the entity to override
+	entityID string,
+	// fieldPath to override
+	fieldPath string,
 	request *Lattice.EntityOverride,
 	opts ...option.RequestOption,
 ) (*Lattice.Entity, error) {
 	response, err := c.WithRawResponse.OverrideEntity(
 		ctx,
+		entityID,
+		fieldPath,
 		request,
 		opts...,
 	)
@@ -98,12 +105,16 @@ func (c *Client) OverrideEntity(
 // This operation clears the override value from the specified field path on the entity.
 func (c *Client) RemoveEntityOverride(
 	ctx context.Context,
-	request *Lattice.RemoveEntityOverrideRequest,
+	// The unique ID of the entity to undo an override from.
+	entityID string,
+	// The fieldPath to clear overrides from.
+	fieldPath string,
 	opts ...option.RequestOption,
 ) (*Lattice.Entity, error) {
 	response, err := c.WithRawResponse.RemoveEntityOverride(
 		ctx,
-		request,
+		entityID,
+		fieldPath,
 		opts...,
 	)
 	if err != nil {

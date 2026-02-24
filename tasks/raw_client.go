@@ -75,7 +75,8 @@ func (r *RawClient) CreateTask(
 
 func (r *RawClient) GetTask(
 	ctx context.Context,
-	request *Lattice.GetTaskRequest,
+	// ID of task to return
+	taskID string,
 	opts ...option.RequestOption,
 ) (*core.Response[*Lattice.Task], error) {
 	options := core.NewRequestOptions(opts...)
@@ -86,7 +87,7 @@ func (r *RawClient) GetTask(
 	)
 	endpointURL := internal.EncodeURL(
 		baseURL+"/api/v1/tasks/%v",
-		request.TaskID,
+		taskID,
 	)
 	headers := internal.MergeHeaders(
 		r.options.ToHeader(),
@@ -119,6 +120,8 @@ func (r *RawClient) GetTask(
 
 func (r *RawClient) UpdateTaskStatus(
 	ctx context.Context,
+	// ID of task to update status of
+	taskID string,
 	request *Lattice.TaskStatusUpdate,
 	opts ...option.RequestOption,
 ) (*core.Response[*Lattice.Task], error) {
@@ -130,7 +133,7 @@ func (r *RawClient) UpdateTaskStatus(
 	)
 	endpointURL := internal.EncodeURL(
 		baseURL+"/api/v1/tasks/%v/status",
-		request.TaskID,
+		taskID,
 	)
 	headers := internal.MergeHeaders(
 		r.options.ToHeader(),

@@ -74,7 +74,8 @@ func (r *RawClient) PublishEntity(
 
 func (r *RawClient) GetEntity(
 	ctx context.Context,
-	request *Lattice.GetEntityRequest,
+	// ID of the entity to return
+	entityID string,
 	opts ...option.RequestOption,
 ) (*core.Response[*Lattice.Entity], error) {
 	options := core.NewRequestOptions(opts...)
@@ -85,7 +86,7 @@ func (r *RawClient) GetEntity(
 	)
 	endpointURL := internal.EncodeURL(
 		baseURL+"/api/v1/entities/%v",
-		request.EntityID,
+		entityID,
 	)
 	headers := internal.MergeHeaders(
 		r.options.ToHeader(),
@@ -118,6 +119,10 @@ func (r *RawClient) GetEntity(
 
 func (r *RawClient) OverrideEntity(
 	ctx context.Context,
+	// The unique ID of the entity to override
+	entityID string,
+	// fieldPath to override
+	fieldPath string,
 	request *Lattice.EntityOverride,
 	opts ...option.RequestOption,
 ) (*core.Response[*Lattice.Entity], error) {
@@ -129,8 +134,8 @@ func (r *RawClient) OverrideEntity(
 	)
 	endpointURL := internal.EncodeURL(
 		baseURL+"/api/v1/entities/%v/override/%v",
-		request.EntityID,
-		request.FieldPath,
+		entityID,
+		fieldPath,
 	)
 	headers := internal.MergeHeaders(
 		r.options.ToHeader(),
@@ -165,7 +170,10 @@ func (r *RawClient) OverrideEntity(
 
 func (r *RawClient) RemoveEntityOverride(
 	ctx context.Context,
-	request *Lattice.RemoveEntityOverrideRequest,
+	// The unique ID of the entity to undo an override from.
+	entityID string,
+	// The fieldPath to clear overrides from.
+	fieldPath string,
 	opts ...option.RequestOption,
 ) (*core.Response[*Lattice.Entity], error) {
 	options := core.NewRequestOptions(opts...)
@@ -176,8 +184,8 @@ func (r *RawClient) RemoveEntityOverride(
 	)
 	endpointURL := internal.EncodeURL(
 		baseURL+"/api/v1/entities/%v/override/%v",
-		request.EntityID,
-		request.FieldPath,
+		entityID,
+		fieldPath,
 	)
 	headers := internal.MergeHeaders(
 		r.options.ToHeader(),
