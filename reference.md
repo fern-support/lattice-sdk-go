@@ -751,6 +751,85 @@ is known are considered stale and ignored.
 </dl>
 </details>
 
+<details><summary><code>client.Tasks.CancelTask(TaskID, request) -> *Lattice.Task</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Cancels a task by marking it for cancellation in the system.
+
+This method initiates task cancellation based on the task's current state:
+- If the task has not been sent to an agent, it cancels immediately and transitions the task
+  to a terminal state (`STATUS_DONE_NOT_OK` with `ERROR_CODE_CANCELLED`).
+- If the task has already been sent to an agent, the cancellation request is routed to the agent with a delivery status of `DELIVERY_STATUS_PENDING_CANCEL`.
+  The agent is responsible for determining whether cancellation is possible and updating
+  the task status accordingly via the `UpdateStatus` endpoint:
+  - If the task can be cancelled, the agent should update the task status to `STATUS_DONE_NOT_OK`.
+  - If the task cannot be cancelled, the agent should attach an error to the task stating why cancellation is not possible using `UpdateStatus`
+    or the returned task object.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```go
+request := &Lattice.TaskCancellation{
+        TaskID: "taskId",
+    }
+client.Tasks.CancelTask(
+        context.TODO(),
+        request,
+    )
+}
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**taskID:** `string` — The ID of task to cancel
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**author:** `*Lattice.Principal` — Who or what is requesting to cancel this task.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
 <details><summary><code>client.Tasks.QueryTasks(request) -> *Lattice.TaskQueryResults</code></summary>
 <dl>
 <dd>
@@ -852,6 +931,98 @@ any of the remaining parameters, but not both.
 </dl>
 </details>
 
+<details><summary><code>client.Tasks.StreamTasks(request) -> Lattice.StreamTasksResponse</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Establishes a server streaming connection that delivers task updates in real-time using Server-Sent Events (SSE).
+
+The stream delivers all existing non-terminal tasks when first connected, followed by real-time
+updates for task creation and status changes. Additionally, heartbeat messages are sent periodically to maintain the connection.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```go
+request := &Lattice.TaskStreamRequest{}
+client.Tasks.StreamTasks(
+        context.TODO(),
+        request,
+    )
+}
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**heartbeatIntervalMs:** `*int` — The time interval, in milliseconds, that determines the frequency at which to send heartbeat events. Defaults to 30000 (30 seconds).
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**rateLimit:** `*int` 
+
+The time interval, in milliseconds, after an update for a given task before another one will be sent for the same task. 
+If set, value must be >= 250. 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**excludePreexistingTasks:** `*bool` 
+
+Optional flag to only include tasks created or updated after the stream is initiated, and not any previous preexisting tasks.
+If unset or false, the stream will include any new tasks and task updates, as well as all preexisting tasks.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**taskType:** `*Lattice.TaskStreamRequestTaskType` — Optional filter that only returns tasks with specific types. If not provided, all task types will be streamed.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
 <details><summary><code>client.Tasks.ListenAsAgent(request) -> *Lattice.AgentRequest</code></summary>
 <dl>
 <dd>
@@ -919,6 +1090,89 @@ client.Tasks.ListenAsAgent(
 <dd>
 
 **agentSelector:** `*Lattice.EntityIDsSelector` — Selector criteria to determine which Agent Tasks the agent receives
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.Tasks.StreamAsAgent(request) -> Lattice.StreamAsAgentResponse</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Establishes a server streaming connection that delivers tasks to taskable agents for execution
+using Server-Sent Events (SSE).
+
+This method creates a connection from the Tasks API to an agent that streams relevant tasks to the listener agent. The agent receives a stream of tasks that match the entities specified by the tasks' selector criteria.
+
+The stream delivers three types of requests:
+- `ExecuteRequest`: Contains a new task for the agent to execute
+- `CancelRequest`: Indicates a task should be canceled
+- `CompleteRequest`: Indicates a task should be completed
+
+Additionally, heartbeat messages are sent periodically to maintain the connection.
+
+This is recommended method for taskable agents to receive and process tasks in real-time.
+Agents should maintain connection to this stream and process incoming tasks according to their capabilities. 
+
+When an agent receives a task, it should update the task status using the `UpdateStatus` endpoint
+to provide progress information back to Tasks API.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```go
+request := &Lattice.AgentStreamRequest{}
+client.Tasks.StreamAsAgent(
+        context.TODO(),
+        request,
+    )
+}
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**agentSelector:** `*Lattice.EntityIDsSelector` — The selector criteria to determine which tasks the agent receives.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**heartbeatIntervalMs:** `*int` — The time interval, defined in seconds, that determines the frequency at which to send heartbeat events. Defaults to 30s.
     
 </dd>
 </dl>
@@ -1006,6 +1260,14 @@ client.Objects.ListObjects(
     
 </dd>
 </dl>
+
+<dl>
+<dd>
+
+**maxPageSize:** `*int` — Sets the maximum number of items that should be returned on a single page.
+    
+</dd>
+</dl>
 </dd>
 </dl>
 
@@ -1080,6 +1342,65 @@ client.Objects.GetObject(
 <dd>
 
 **priority:** `*string` — Indicates a client's preference for the priority of the response. The value is a structured header as defined in RFC 9218. If you do not set the header, Lattice uses the default priority set for the environment. Incremental delivery directives are not supported and will be ignored.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.Objects.UploadObject(ObjectPath, request) -> *Lattice.PathMetadata</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Uploads an object. The object must be 1 GiB or smaller.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```go
+client.Objects.UploadObject(
+        context.TODO(),
+        "<objectPath>",
+        request,
+    )
+}
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**objectPath:** `string` — Path of the Object that is to be uploaded.
     
 </dd>
 </dl>
@@ -1212,3 +1533,80 @@ client.Objects.GetObjectMetadata(
 </dd>
 </dl>
 </details>
+
+## oauth
+<details><summary><code>client.Oauth.GetToken(request) -> *Lattice.GetTokenResponse</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Gets a new short-lived token using the specified client credentials
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```go
+request := &Lattice.GetTokenRequest{}
+client.Oauth.GetToken(
+        context.TODO(),
+        request,
+    )
+}
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**grantType:** `string` — The type of grant being requested
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**clientID:** `*string` — The client identifier
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**clientSecret:** `*string` — The client secret
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+

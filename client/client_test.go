@@ -3,7 +3,7 @@
 package client
 
 import (
-	option "github.com/anduril/lattice-sdk-go/v4/option"
+	option "github.com/fern-support/lattice-sdk-go/v4/option"
 	assert "github.com/stretchr/testify/assert"
 	http "net/http"
 	testing "testing"
