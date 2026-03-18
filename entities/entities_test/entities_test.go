@@ -6,36 +6,36 @@ import (
 	bytes "bytes"
 	context "context"
 	json "encoding/json"
-	Lattice "github.com/anduril/lattice-sdk-go/v4"
-	client "github.com/anduril/lattice-sdk-go/v4/client"
-	option "github.com/anduril/lattice-sdk-go/v4/option"
+	Lattice "github.com/fern-support/lattice-sdk-go/v4"
+	client "github.com/fern-support/lattice-sdk-go/v4/client"
+	option "github.com/fern-support/lattice-sdk-go/v4/option"
 	require "github.com/stretchr/testify/require"
 	http "net/http"
+	os "os"
 	testing "testing"
 )
 
-func ResetWireMockRequests(
-	t *testing.T,
-) {
-	WiremockAdminURL := "http://localhost:8080/__admin"
-	_, err := http.Post(WiremockAdminURL+"/requests/reset", "application/json", nil)
-	require.NoError(t, err)
-}
-
 func VerifyRequestCount(
 	t *testing.T,
+	testId string,
 	method string,
 	urlPath string,
 	queryParams map[string]string,
 	expected int,
 ) {
-	WiremockAdminURL := "http://localhost:8080/__admin"
+	wiremockURL := os.Getenv("WIREMOCK_URL")
+	if wiremockURL == "" {
+		wiremockURL = "http://localhost:8080"
+	}
+	WiremockAdminURL := wiremockURL + "/__admin"
 	var reqBody bytes.Buffer
 	reqBody.WriteString(`{"method":"`)
 	reqBody.WriteString(method)
 	reqBody.WriteString(`","urlPath":"`)
 	reqBody.WriteString(urlPath)
-	reqBody.WriteString(`"}`)
+	reqBody.WriteString(`","headers":{"X-Test-Id":{"equalTo":"`)
+	reqBody.WriteString(testId)
+	reqBody.WriteString(`"}}`)
 	if len(queryParams) > 0 {
 		reqBody.WriteString(`,"queryParameters":{`)
 		first := true
@@ -52,6 +52,7 @@ func VerifyRequestCount(
 		}
 		reqBody.WriteString("}")
 	}
+	reqBody.WriteString("}")
 	resp, err := http.Post(WiremockAdminURL+"/requests/find", "application/json", &reqBody)
 	require.NoError(t, err)
 	var result struct {
@@ -64,32 +65,35 @@ func VerifyRequestCount(
 func TestEntitiesPublishEntityWithWireMock(
 	t *testing.T,
 ) {
-	ResetWireMockRequests(t)
-	WireMockBaseURL := "http://localhost:8080"
+	WireMockBaseURL := os.Getenv("WIREMOCK_URL")
+	if WireMockBaseURL == "" {
+		WireMockBaseURL = "http://localhost:8080"
+	}
 	client := client.NewClient(
-		option.WithBaseURL(
-			WireMockBaseURL,
-		),
+		option.WithBaseURL(WireMockBaseURL),
 	)
 	request := &Lattice.Entity{}
 	_, invocationErr := client.Entities.PublishEntity(
 		context.TODO(),
 		request,
+		option.WithHTTPHeader(
+			http.Header{"X-Test-Id": []string{"TestEntitiesPublishEntityWithWireMock"}},
+		),
 	)
 
 	require.NoError(t, invocationErr, "Client method call should succeed")
-	VerifyRequestCount(t, "PUT", "/api/v1/entities", nil, 1)
+	VerifyRequestCount(t, "TestEntitiesPublishEntityWithWireMock", "PUT", "/api/v1/entities", nil, 1)
 }
 
 func TestEntitiesGetEntityWithWireMock(
 	t *testing.T,
 ) {
-	ResetWireMockRequests(t)
-	WireMockBaseURL := "http://localhost:8080"
+	WireMockBaseURL := os.Getenv("WIREMOCK_URL")
+	if WireMockBaseURL == "" {
+		WireMockBaseURL = "http://localhost:8080"
+	}
 	client := client.NewClient(
-		option.WithBaseURL(
-			WireMockBaseURL,
-		),
+		option.WithBaseURL(WireMockBaseURL),
 	)
 	request := &Lattice.GetEntityRequest{
 		EntityID: "entityId",
@@ -97,21 +101,24 @@ func TestEntitiesGetEntityWithWireMock(
 	_, invocationErr := client.Entities.GetEntity(
 		context.TODO(),
 		request,
+		option.WithHTTPHeader(
+			http.Header{"X-Test-Id": []string{"TestEntitiesGetEntityWithWireMock"}},
+		),
 	)
 
 	require.NoError(t, invocationErr, "Client method call should succeed")
-	VerifyRequestCount(t, "GET", "/api/v1/entities/entityId", nil, 1)
+	VerifyRequestCount(t, "TestEntitiesGetEntityWithWireMock", "GET", "/api/v1/entities/entityId", nil, 1)
 }
 
 func TestEntitiesOverrideEntityWithWireMock(
 	t *testing.T,
 ) {
-	ResetWireMockRequests(t)
-	WireMockBaseURL := "http://localhost:8080"
+	WireMockBaseURL := os.Getenv("WIREMOCK_URL")
+	if WireMockBaseURL == "" {
+		WireMockBaseURL = "http://localhost:8080"
+	}
 	client := client.NewClient(
-		option.WithBaseURL(
-			WireMockBaseURL,
-		),
+		option.WithBaseURL(WireMockBaseURL),
 	)
 	request := &Lattice.EntityOverride{
 		EntityID:  "entityId",
@@ -120,21 +127,24 @@ func TestEntitiesOverrideEntityWithWireMock(
 	_, invocationErr := client.Entities.OverrideEntity(
 		context.TODO(),
 		request,
+		option.WithHTTPHeader(
+			http.Header{"X-Test-Id": []string{"TestEntitiesOverrideEntityWithWireMock"}},
+		),
 	)
 
 	require.NoError(t, invocationErr, "Client method call should succeed")
-	VerifyRequestCount(t, "PUT", "/api/v1/entities/entityId/override/mil_view.disposition", nil, 1)
+	VerifyRequestCount(t, "TestEntitiesOverrideEntityWithWireMock", "PUT", "/api/v1/entities/entityId/override/mil_view.disposition", nil, 1)
 }
 
 func TestEntitiesRemoveEntityOverrideWithWireMock(
 	t *testing.T,
 ) {
-	ResetWireMockRequests(t)
-	WireMockBaseURL := "http://localhost:8080"
+	WireMockBaseURL := os.Getenv("WIREMOCK_URL")
+	if WireMockBaseURL == "" {
+		WireMockBaseURL = "http://localhost:8080"
+	}
 	client := client.NewClient(
-		option.WithBaseURL(
-			WireMockBaseURL,
-		),
+		option.WithBaseURL(WireMockBaseURL),
 	)
 	request := &Lattice.RemoveEntityOverrideRequest{
 		EntityID:  "entityId",
@@ -143,21 +153,24 @@ func TestEntitiesRemoveEntityOverrideWithWireMock(
 	_, invocationErr := client.Entities.RemoveEntityOverride(
 		context.TODO(),
 		request,
+		option.WithHTTPHeader(
+			http.Header{"X-Test-Id": []string{"TestEntitiesRemoveEntityOverrideWithWireMock"}},
+		),
 	)
 
 	require.NoError(t, invocationErr, "Client method call should succeed")
-	VerifyRequestCount(t, "DELETE", "/api/v1/entities/entityId/override/mil_view.disposition", nil, 1)
+	VerifyRequestCount(t, "TestEntitiesRemoveEntityOverrideWithWireMock", "DELETE", "/api/v1/entities/entityId/override/mil_view.disposition", nil, 1)
 }
 
 func TestEntitiesLongPollEntityEventsWithWireMock(
 	t *testing.T,
 ) {
-	ResetWireMockRequests(t)
-	WireMockBaseURL := "http://localhost:8080"
+	WireMockBaseURL := os.Getenv("WIREMOCK_URL")
+	if WireMockBaseURL == "" {
+		WireMockBaseURL = "http://localhost:8080"
+	}
 	client := client.NewClient(
-		option.WithBaseURL(
-			WireMockBaseURL,
-		),
+		option.WithBaseURL(WireMockBaseURL),
 	)
 	request := &Lattice.EntityEventRequest{
 		SessionToken: "sessionToken",
@@ -165,28 +178,34 @@ func TestEntitiesLongPollEntityEventsWithWireMock(
 	_, invocationErr := client.Entities.LongPollEntityEvents(
 		context.TODO(),
 		request,
+		option.WithHTTPHeader(
+			http.Header{"X-Test-Id": []string{"TestEntitiesLongPollEntityEventsWithWireMock"}},
+		),
 	)
 
 	require.NoError(t, invocationErr, "Client method call should succeed")
-	VerifyRequestCount(t, "POST", "/api/v1/entities/events", nil, 1)
+	VerifyRequestCount(t, "TestEntitiesLongPollEntityEventsWithWireMock", "POST", "/api/v1/entities/events", nil, 1)
 }
 
 func TestEntitiesStreamEntitiesWithWireMock(
 	t *testing.T,
 ) {
-	ResetWireMockRequests(t)
-	WireMockBaseURL := "http://localhost:8080"
+	WireMockBaseURL := os.Getenv("WIREMOCK_URL")
+	if WireMockBaseURL == "" {
+		WireMockBaseURL = "http://localhost:8080"
+	}
 	client := client.NewClient(
-		option.WithBaseURL(
-			WireMockBaseURL,
-		),
+		option.WithBaseURL(WireMockBaseURL),
 	)
 	request := &Lattice.EntityStreamRequest{}
 	_, invocationErr := client.Entities.StreamEntities(
 		context.TODO(),
 		request,
+		option.WithHTTPHeader(
+			http.Header{"X-Test-Id": []string{"TestEntitiesStreamEntitiesWithWireMock"}},
+		),
 	)
 
 	require.NoError(t, invocationErr, "Client method call should succeed")
-	VerifyRequestCount(t, "POST", "/api/v1/entities/stream", nil, 1)
+	VerifyRequestCount(t, "TestEntitiesStreamEntitiesWithWireMock", "POST", "/api/v1/entities/stream", nil, 1)
 }

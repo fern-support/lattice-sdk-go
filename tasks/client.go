@@ -4,10 +4,11 @@ package tasks
 
 import (
 	context "context"
-	Lattice "github.com/anduril/lattice-sdk-go/v4"
-	core "github.com/anduril/lattice-sdk-go/v4/core"
-	internal "github.com/anduril/lattice-sdk-go/v4/internal"
-	option "github.com/anduril/lattice-sdk-go/v4/option"
+	Lattice "github.com/fern-support/lattice-sdk-go/v4"
+	core "github.com/fern-support/lattice-sdk-go/v4/core"
+	internal "github.com/fern-support/lattice-sdk-go/v4/internal"
+	option "github.com/fern-support/lattice-sdk-go/v4/option"
+	http "net/http"
 )
 
 type Client struct {
@@ -107,6 +108,33 @@ func (c *Client) UpdateTaskStatus(
 	return response.Body, nil
 }
 
+// Cancels a task by marking it for cancellation in the system.
+//
+// This method initiates task cancellation based on the task's current state:
+//   - If the task has not been sent to an agent, it cancels immediately and transitions the task
+//     to a terminal state (`STATUS_DONE_NOT_OK` with `ERROR_CODE_CANCELLED`).
+//   - If the task has already been sent to an agent, the cancellation request is routed to the agent with a delivery status of `DELIVERY_STATUS_PENDING_CANCEL`.
+//     The agent is responsible for determining whether cancellation is possible and updating
+//     the task status accordingly via the `UpdateStatus` endpoint:
+//   - If the task can be cancelled, the agent should update the task status to `STATUS_DONE_NOT_OK`.
+//   - If the task cannot be cancelled, the agent should attach an error to the task stating why cancellation is not possible using `UpdateStatus`
+//     or the returned task object.
+func (c *Client) CancelTask(
+	ctx context.Context,
+	request *Lattice.TaskCancellation,
+	opts ...option.RequestOption,
+) (*Lattice.Task, error) {
+	response, err := c.WithRawResponse.CancelTask(
+		ctx,
+		request,
+		opts...,
+	)
+	if err != nil {
+		return nil, err
+	}
+	return response.Body, nil
+}
+
 // Searches for Tasks that match specified filtering criteria and returns matching tasks in paginated form.
 //
 // This method allows filtering tasks based on multiple criteria including:
@@ -136,6 +164,49 @@ func (c *Client) QueryTasks(
 		return nil, err
 	}
 	return response.Body, nil
+}
+
+// Establishes a server streaming connection that delivers task updates in real-time using Server-Sent Events (SSE).
+//
+// The stream delivers all existing non-terminal tasks when first connected, followed by real-time
+// updates for task creation and status changes. Additionally, heartbeat messages are sent periodically to maintain the connection.
+func (c *Client) StreamTasks(
+	ctx context.Context,
+	request *Lattice.TaskStreamRequest,
+	opts ...option.RequestOption,
+) (*core.Stream[Lattice.StreamTasksResponse], error) {
+	options := core.NewRequestOptions(opts...)
+	baseURL := internal.ResolveBaseURL(
+		options.BaseURL,
+		c.baseURL,
+		"https://example.developer.anduril.com",
+	)
+	endpointURL := baseURL + "/api/v1/tasks/stream"
+	headers := internal.MergeHeaders(
+		c.options.ToHeader(),
+		options.ToHeader(),
+	)
+	headers.Add("Accept", "text/event-stream")
+	headers.Add("Content-Type", "application/json")
+	streamer := internal.NewStreamer[Lattice.StreamTasksResponse](c.caller)
+	return streamer.Stream(
+		ctx,
+		&internal.StreamParams{
+			URL:             endpointURL,
+			Method:          http.MethodPost,
+			Headers:         headers,
+			MaxAttempts:     options.MaxAttempts,
+			BodyProperties:  options.BodyProperties,
+			QueryParameters: options.QueryParameters,
+			Client:          options.HTTPClient,
+			MaxBufSize:      options.MaxBufSize,
+			Prefix:          internal.DefaultSSEDataPrefix,
+			Terminator:      internal.DefaultSSETerminator,
+			Format:          core.StreamFormatSSE,
+			Request:         request,
+			ErrorDecoder:    internal.NewErrorDecoder(Lattice.ErrorCodes),
+		},
+	)
 }
 
 // Establishes a server streaming connection that delivers tasks to taskable agents for execution.
@@ -172,4 +243,60 @@ func (c *Client) ListenAsAgent(
 		return nil, err
 	}
 	return response.Body, nil
+}
+
+// Establishes a server streaming connection that delivers tasks to taskable agents for execution
+// using Server-Sent Events (SSE).
+//
+// This method creates a connection from the Tasks API to an agent that streams relevant tasks to the listener agent. The agent receives a stream of tasks that match the entities specified by the tasks' selector criteria.
+//
+// The stream delivers three types of requests:
+// - `ExecuteRequest`: Contains a new task for the agent to execute
+// - `CancelRequest`: Indicates a task should be canceled
+// - `CompleteRequest`: Indicates a task should be completed
+//
+// Additionally, heartbeat messages are sent periodically to maintain the connection.
+//
+// This is recommended method for taskable agents to receive and process tasks in real-time.
+// Agents should maintain connection to this stream and process incoming tasks according to their capabilities.
+//
+// When an agent receives a task, it should update the task status using the `UpdateStatus` endpoint
+// to provide progress information back to Tasks API.
+func (c *Client) StreamAsAgent(
+	ctx context.Context,
+	request *Lattice.AgentStreamRequest,
+	opts ...option.RequestOption,
+) (*core.Stream[Lattice.StreamAsAgentResponse], error) {
+	options := core.NewRequestOptions(opts...)
+	baseURL := internal.ResolveBaseURL(
+		options.BaseURL,
+		c.baseURL,
+		"https://example.developer.anduril.com",
+	)
+	endpointURL := baseURL + "/api/v1/agent/stream"
+	headers := internal.MergeHeaders(
+		c.options.ToHeader(),
+		options.ToHeader(),
+	)
+	headers.Add("Accept", "text/event-stream")
+	headers.Add("Content-Type", "application/json")
+	streamer := internal.NewStreamer[Lattice.StreamAsAgentResponse](c.caller)
+	return streamer.Stream(
+		ctx,
+		&internal.StreamParams{
+			URL:             endpointURL,
+			Method:          http.MethodPost,
+			Headers:         headers,
+			MaxAttempts:     options.MaxAttempts,
+			BodyProperties:  options.BodyProperties,
+			QueryParameters: options.QueryParameters,
+			Client:          options.HTTPClient,
+			MaxBufSize:      options.MaxBufSize,
+			Prefix:          internal.DefaultSSEDataPrefix,
+			Terminator:      internal.DefaultSSETerminator,
+			Format:          core.StreamFormatSSE,
+			Request:         request,
+			ErrorDecoder:    internal.NewErrorDecoder(Lattice.ErrorCodes),
+		},
+	)
 }
