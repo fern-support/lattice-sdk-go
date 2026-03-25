@@ -4,6 +4,7 @@ package oauth
 
 import (
 	context "context"
+
 	Lattice "github.com/fern-support/lattice-sdk-go/v4"
 	core "github.com/fern-support/lattice-sdk-go/v4/core"
 	internal "github.com/fern-support/lattice-sdk-go/v4/internal"
