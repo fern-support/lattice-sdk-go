@@ -887,55 +887,39 @@ func TestSettersMarkExplicitEntityEventResponse(t *testing.T) {
 }
 
 func TestSettersEntityStreamEvent(t *testing.T) {
-	t.Run("SetEventType", func(t *testing.T) {
+	t.Run("SetData", func(t *testing.T) {
 		obj := &EntityStreamEvent{}
-		var fernTestValueEventType *EntityEventEventType
-		obj.SetEventType(fernTestValueEventType)
-		assert.Equal(t, fernTestValueEventType, obj.EventType)
-		assert.NotNil(t, obj.explicitFields)
-	})
-
-	t.Run("SetTime", func(t *testing.T) {
-		obj := &EntityStreamEvent{}
-		var fernTestValueTime *time.Time
-		obj.SetTime(fernTestValueTime)
-		assert.Equal(t, fernTestValueTime, obj.Time)
-		assert.NotNil(t, obj.explicitFields)
-	})
-
-	t.Run("SetEntity", func(t *testing.T) {
-		obj := &EntityStreamEvent{}
-		var fernTestValueEntity *Entity
-		obj.SetEntity(fernTestValueEntity)
-		assert.Equal(t, fernTestValueEntity, obj.Entity)
+		var fernTestValueData *EntityEvent
+		obj.SetData(fernTestValueData)
+		assert.Equal(t, fernTestValueData, obj.Data)
 		assert.NotNil(t, obj.explicitFields)
 	})
 
 }
 
 func TestGettersEntityStreamEvent(t *testing.T) {
-	t.Run("GetEventType", func(t *testing.T) {
+	t.Run("GetData", func(t *testing.T) {
 		t.Parallel()
 		// Arrange
 		obj := &EntityStreamEvent{}
-		var expected *EntityEventEventType
-		obj.EventType = expected
+		var expected *EntityEvent
+		obj.Data = expected
 
 		// Act & Assert
-		assert.Equal(t, expected, obj.GetEventType(), "getter should return the property value")
+		assert.Equal(t, expected, obj.GetData(), "getter should return the property value")
 	})
 
-	t.Run("GetEventType_NilValue", func(t *testing.T) {
+	t.Run("GetData_NilValue", func(t *testing.T) {
 		t.Parallel()
 		// Arrange
 		obj := &EntityStreamEvent{}
-		obj.EventType = nil
+		obj.Data = nil
 
 		// Act & Assert
-		assert.Nil(t, obj.GetEventType(), "getter should return nil when property is nil")
+		assert.Nil(t, obj.GetData(), "getter should return nil when property is nil")
 	})
 
-	t.Run("GetEventType_NilReceiver", func(t *testing.T) {
+	t.Run("GetData_NilReceiver", func(t *testing.T) {
 		t.Parallel()
 		var obj *EntityStreamEvent
 		// Should not panic - getters should handle nil receiver gracefully
@@ -944,148 +928,20 @@ func TestGettersEntityStreamEvent(t *testing.T) {
 				t.Errorf("Getter panicked on nil receiver: %v", r)
 			}
 		}()
-		_ = obj.GetEventType() // Should return zero value
-	})
-
-	t.Run("GetTime", func(t *testing.T) {
-		t.Parallel()
-		// Arrange
-		obj := &EntityStreamEvent{}
-		var expected *time.Time
-		obj.Time = expected
-
-		// Act & Assert
-		assert.Equal(t, expected, obj.GetTime(), "getter should return the property value")
-	})
-
-	t.Run("GetTime_NilValue", func(t *testing.T) {
-		t.Parallel()
-		// Arrange
-		obj := &EntityStreamEvent{}
-		obj.Time = nil
-
-		// Act & Assert
-		assert.Nil(t, obj.GetTime(), "getter should return nil when property is nil")
-	})
-
-	t.Run("GetTime_NilReceiver", func(t *testing.T) {
-		t.Parallel()
-		var obj *EntityStreamEvent
-		// Should not panic - getters should handle nil receiver gracefully
-		defer func() {
-			if r := recover(); r != nil {
-				t.Errorf("Getter panicked on nil receiver: %v", r)
-			}
-		}()
-		_ = obj.GetTime() // Should return zero value
-	})
-
-	t.Run("GetEntity", func(t *testing.T) {
-		t.Parallel()
-		// Arrange
-		obj := &EntityStreamEvent{}
-		var expected *Entity
-		obj.Entity = expected
-
-		// Act & Assert
-		assert.Equal(t, expected, obj.GetEntity(), "getter should return the property value")
-	})
-
-	t.Run("GetEntity_NilValue", func(t *testing.T) {
-		t.Parallel()
-		// Arrange
-		obj := &EntityStreamEvent{}
-		obj.Entity = nil
-
-		// Act & Assert
-		assert.Nil(t, obj.GetEntity(), "getter should return nil when property is nil")
-	})
-
-	t.Run("GetEntity_NilReceiver", func(t *testing.T) {
-		t.Parallel()
-		var obj *EntityStreamEvent
-		// Should not panic - getters should handle nil receiver gracefully
-		defer func() {
-			if r := recover(); r != nil {
-				t.Errorf("Getter panicked on nil receiver: %v", r)
-			}
-		}()
-		_ = obj.GetEntity() // Should return zero value
+		_ = obj.GetData() // Should return zero value
 	})
 
 }
 
 func TestSettersMarkExplicitEntityStreamEvent(t *testing.T) {
-	t.Run("SetEventType_MarksExplicit", func(t *testing.T) {
+	t.Run("SetData_MarksExplicit", func(t *testing.T) {
 		t.Parallel()
 		// Arrange
 		obj := &EntityStreamEvent{}
-		var fernTestValueEventType *EntityEventEventType
+		var fernTestValueData *EntityEvent
 
 		// Act
-		obj.SetEventType(fernTestValueEventType)
-
-		// Assert - object with explicitly set field can be marshaled/unmarshaled
-		bytes, err := json.Marshal(obj)
-		require.NoError(t, err, "marshaling should succeed for test setup")
-
-		// This test ensures JSON marshaling and unmarshaling succeed when the field has a zero/nil value
-		// Detect if marshaled JSON is an object or primitive to use correct unmarshal target
-		if len(bytes) > 0 && bytes[0] == '{' {
-			// JSON object - unmarshal into map
-			var unmarshaled map[string]interface{}
-			err = json.Unmarshal(bytes, &unmarshaled)
-			require.NoError(t, err, "unmarshaling should succeed for test verification")
-		} else {
-			// JSON primitive (string, number, boolean, null) - unmarshal into interface{}
-			var unmarshaled interface{}
-			err = json.Unmarshal(bytes, &unmarshaled)
-			require.NoError(t, err, "unmarshaling should succeed for test verification")
-		}
-
-		// Note: This does not explicitly assert the presence of a specific JSON field
-		// It verifies that setting a field via setter allows successful JSON round-trip
-	})
-
-	t.Run("SetTime_MarksExplicit", func(t *testing.T) {
-		t.Parallel()
-		// Arrange
-		obj := &EntityStreamEvent{}
-		var fernTestValueTime *time.Time
-
-		// Act
-		obj.SetTime(fernTestValueTime)
-
-		// Assert - object with explicitly set field can be marshaled/unmarshaled
-		bytes, err := json.Marshal(obj)
-		require.NoError(t, err, "marshaling should succeed for test setup")
-
-		// This test ensures JSON marshaling and unmarshaling succeed when the field has a zero/nil value
-		// Detect if marshaled JSON is an object or primitive to use correct unmarshal target
-		if len(bytes) > 0 && bytes[0] == '{' {
-			// JSON object - unmarshal into map
-			var unmarshaled map[string]interface{}
-			err = json.Unmarshal(bytes, &unmarshaled)
-			require.NoError(t, err, "unmarshaling should succeed for test verification")
-		} else {
-			// JSON primitive (string, number, boolean, null) - unmarshal into interface{}
-			var unmarshaled interface{}
-			err = json.Unmarshal(bytes, &unmarshaled)
-			require.NoError(t, err, "unmarshaling should succeed for test verification")
-		}
-
-		// Note: This does not explicitly assert the presence of a specific JSON field
-		// It verifies that setting a field via setter allows successful JSON round-trip
-	})
-
-	t.Run("SetEntity_MarksExplicit", func(t *testing.T) {
-		t.Parallel()
-		// Arrange
-		obj := &EntityStreamEvent{}
-		var fernTestValueEntity *Entity
-
-		// Act
-		obj.SetEntity(fernTestValueEntity)
+		obj.SetData(fernTestValueData)
 
 		// Assert - object with explicitly set field can be marshaled/unmarshaled
 		bytes, err := json.Marshal(obj)
@@ -1112,39 +968,39 @@ func TestSettersMarkExplicitEntityStreamEvent(t *testing.T) {
 }
 
 func TestSettersEntityStreamHeartbeat(t *testing.T) {
-	t.Run("SetTimestamp", func(t *testing.T) {
+	t.Run("SetData", func(t *testing.T) {
 		obj := &EntityStreamHeartbeat{}
-		var fernTestValueTimestamp *string
-		obj.SetTimestamp(fernTestValueTimestamp)
-		assert.Equal(t, fernTestValueTimestamp, obj.Timestamp)
+		var fernTestValueData *HeartbeatObject
+		obj.SetData(fernTestValueData)
+		assert.Equal(t, fernTestValueData, obj.Data)
 		assert.NotNil(t, obj.explicitFields)
 	})
 
 }
 
 func TestGettersEntityStreamHeartbeat(t *testing.T) {
-	t.Run("GetTimestamp", func(t *testing.T) {
+	t.Run("GetData", func(t *testing.T) {
 		t.Parallel()
 		// Arrange
 		obj := &EntityStreamHeartbeat{}
-		var expected *string
-		obj.Timestamp = expected
+		var expected *HeartbeatObject
+		obj.Data = expected
 
 		// Act & Assert
-		assert.Equal(t, expected, obj.GetTimestamp(), "getter should return the property value")
+		assert.Equal(t, expected, obj.GetData(), "getter should return the property value")
 	})
 
-	t.Run("GetTimestamp_NilValue", func(t *testing.T) {
+	t.Run("GetData_NilValue", func(t *testing.T) {
 		t.Parallel()
 		// Arrange
 		obj := &EntityStreamHeartbeat{}
-		obj.Timestamp = nil
+		obj.Data = nil
 
 		// Act & Assert
-		assert.Nil(t, obj.GetTimestamp(), "getter should return nil when property is nil")
+		assert.Nil(t, obj.GetData(), "getter should return nil when property is nil")
 	})
 
-	t.Run("GetTimestamp_NilReceiver", func(t *testing.T) {
+	t.Run("GetData_NilReceiver", func(t *testing.T) {
 		t.Parallel()
 		var obj *EntityStreamHeartbeat
 		// Should not panic - getters should handle nil receiver gracefully
@@ -1153,20 +1009,20 @@ func TestGettersEntityStreamHeartbeat(t *testing.T) {
 				t.Errorf("Getter panicked on nil receiver: %v", r)
 			}
 		}()
-		_ = obj.GetTimestamp() // Should return zero value
+		_ = obj.GetData() // Should return zero value
 	})
 
 }
 
 func TestSettersMarkExplicitEntityStreamHeartbeat(t *testing.T) {
-	t.Run("SetTimestamp_MarksExplicit", func(t *testing.T) {
+	t.Run("SetData_MarksExplicit", func(t *testing.T) {
 		t.Parallel()
 		// Arrange
 		obj := &EntityStreamHeartbeat{}
-		var fernTestValueTimestamp *string
+		var fernTestValueData *HeartbeatObject
 
 		// Act
-		obj.SetTimestamp(fernTestValueTimestamp)
+		obj.SetData(fernTestValueData)
 
 		// Assert - object with explicitly set field can be marshaled/unmarshaled
 		bytes, err := json.Marshal(obj)

@@ -1136,55 +1136,39 @@ func TestSettersMarkExplicitAgentRequest(t *testing.T) {
 }
 
 func TestSettersAgentStreamEvent(t *testing.T) {
-	t.Run("SetExecuteRequest", func(t *testing.T) {
+	t.Run("SetData", func(t *testing.T) {
 		obj := &AgentStreamEvent{}
-		var fernTestValueExecuteRequest *ExecuteRequest
-		obj.SetExecuteRequest(fernTestValueExecuteRequest)
-		assert.Equal(t, fernTestValueExecuteRequest, obj.ExecuteRequest)
-		assert.NotNil(t, obj.explicitFields)
-	})
-
-	t.Run("SetCancelRequest", func(t *testing.T) {
-		obj := &AgentStreamEvent{}
-		var fernTestValueCancelRequest *CancelRequest
-		obj.SetCancelRequest(fernTestValueCancelRequest)
-		assert.Equal(t, fernTestValueCancelRequest, obj.CancelRequest)
-		assert.NotNil(t, obj.explicitFields)
-	})
-
-	t.Run("SetCompleteRequest", func(t *testing.T) {
-		obj := &AgentStreamEvent{}
-		var fernTestValueCompleteRequest *CompleteRequest
-		obj.SetCompleteRequest(fernTestValueCompleteRequest)
-		assert.Equal(t, fernTestValueCompleteRequest, obj.CompleteRequest)
+		var fernTestValueData *AgentTaskRequest
+		obj.SetData(fernTestValueData)
+		assert.Equal(t, fernTestValueData, obj.Data)
 		assert.NotNil(t, obj.explicitFields)
 	})
 
 }
 
 func TestGettersAgentStreamEvent(t *testing.T) {
-	t.Run("GetExecuteRequest", func(t *testing.T) {
+	t.Run("GetData", func(t *testing.T) {
 		t.Parallel()
 		// Arrange
 		obj := &AgentStreamEvent{}
-		var expected *ExecuteRequest
-		obj.ExecuteRequest = expected
+		var expected *AgentTaskRequest
+		obj.Data = expected
 
 		// Act & Assert
-		assert.Equal(t, expected, obj.GetExecuteRequest(), "getter should return the property value")
+		assert.Equal(t, expected, obj.GetData(), "getter should return the property value")
 	})
 
-	t.Run("GetExecuteRequest_NilValue", func(t *testing.T) {
+	t.Run("GetData_NilValue", func(t *testing.T) {
 		t.Parallel()
 		// Arrange
 		obj := &AgentStreamEvent{}
-		obj.ExecuteRequest = nil
+		obj.Data = nil
 
 		// Act & Assert
-		assert.Nil(t, obj.GetExecuteRequest(), "getter should return nil when property is nil")
+		assert.Nil(t, obj.GetData(), "getter should return nil when property is nil")
 	})
 
-	t.Run("GetExecuteRequest_NilReceiver", func(t *testing.T) {
+	t.Run("GetData_NilReceiver", func(t *testing.T) {
 		t.Parallel()
 		var obj *AgentStreamEvent
 		// Should not panic - getters should handle nil receiver gracefully
@@ -1193,148 +1177,20 @@ func TestGettersAgentStreamEvent(t *testing.T) {
 				t.Errorf("Getter panicked on nil receiver: %v", r)
 			}
 		}()
-		_ = obj.GetExecuteRequest() // Should return zero value
-	})
-
-	t.Run("GetCancelRequest", func(t *testing.T) {
-		t.Parallel()
-		// Arrange
-		obj := &AgentStreamEvent{}
-		var expected *CancelRequest
-		obj.CancelRequest = expected
-
-		// Act & Assert
-		assert.Equal(t, expected, obj.GetCancelRequest(), "getter should return the property value")
-	})
-
-	t.Run("GetCancelRequest_NilValue", func(t *testing.T) {
-		t.Parallel()
-		// Arrange
-		obj := &AgentStreamEvent{}
-		obj.CancelRequest = nil
-
-		// Act & Assert
-		assert.Nil(t, obj.GetCancelRequest(), "getter should return nil when property is nil")
-	})
-
-	t.Run("GetCancelRequest_NilReceiver", func(t *testing.T) {
-		t.Parallel()
-		var obj *AgentStreamEvent
-		// Should not panic - getters should handle nil receiver gracefully
-		defer func() {
-			if r := recover(); r != nil {
-				t.Errorf("Getter panicked on nil receiver: %v", r)
-			}
-		}()
-		_ = obj.GetCancelRequest() // Should return zero value
-	})
-
-	t.Run("GetCompleteRequest", func(t *testing.T) {
-		t.Parallel()
-		// Arrange
-		obj := &AgentStreamEvent{}
-		var expected *CompleteRequest
-		obj.CompleteRequest = expected
-
-		// Act & Assert
-		assert.Equal(t, expected, obj.GetCompleteRequest(), "getter should return the property value")
-	})
-
-	t.Run("GetCompleteRequest_NilValue", func(t *testing.T) {
-		t.Parallel()
-		// Arrange
-		obj := &AgentStreamEvent{}
-		obj.CompleteRequest = nil
-
-		// Act & Assert
-		assert.Nil(t, obj.GetCompleteRequest(), "getter should return nil when property is nil")
-	})
-
-	t.Run("GetCompleteRequest_NilReceiver", func(t *testing.T) {
-		t.Parallel()
-		var obj *AgentStreamEvent
-		// Should not panic - getters should handle nil receiver gracefully
-		defer func() {
-			if r := recover(); r != nil {
-				t.Errorf("Getter panicked on nil receiver: %v", r)
-			}
-		}()
-		_ = obj.GetCompleteRequest() // Should return zero value
+		_ = obj.GetData() // Should return zero value
 	})
 
 }
 
 func TestSettersMarkExplicitAgentStreamEvent(t *testing.T) {
-	t.Run("SetExecuteRequest_MarksExplicit", func(t *testing.T) {
+	t.Run("SetData_MarksExplicit", func(t *testing.T) {
 		t.Parallel()
 		// Arrange
 		obj := &AgentStreamEvent{}
-		var fernTestValueExecuteRequest *ExecuteRequest
+		var fernTestValueData *AgentTaskRequest
 
 		// Act
-		obj.SetExecuteRequest(fernTestValueExecuteRequest)
-
-		// Assert - object with explicitly set field can be marshaled/unmarshaled
-		bytes, err := json.Marshal(obj)
-		require.NoError(t, err, "marshaling should succeed for test setup")
-
-		// This test ensures JSON marshaling and unmarshaling succeed when the field has a zero/nil value
-		// Detect if marshaled JSON is an object or primitive to use correct unmarshal target
-		if len(bytes) > 0 && bytes[0] == '{' {
-			// JSON object - unmarshal into map
-			var unmarshaled map[string]interface{}
-			err = json.Unmarshal(bytes, &unmarshaled)
-			require.NoError(t, err, "unmarshaling should succeed for test verification")
-		} else {
-			// JSON primitive (string, number, boolean, null) - unmarshal into interface{}
-			var unmarshaled interface{}
-			err = json.Unmarshal(bytes, &unmarshaled)
-			require.NoError(t, err, "unmarshaling should succeed for test verification")
-		}
-
-		// Note: This does not explicitly assert the presence of a specific JSON field
-		// It verifies that setting a field via setter allows successful JSON round-trip
-	})
-
-	t.Run("SetCancelRequest_MarksExplicit", func(t *testing.T) {
-		t.Parallel()
-		// Arrange
-		obj := &AgentStreamEvent{}
-		var fernTestValueCancelRequest *CancelRequest
-
-		// Act
-		obj.SetCancelRequest(fernTestValueCancelRequest)
-
-		// Assert - object with explicitly set field can be marshaled/unmarshaled
-		bytes, err := json.Marshal(obj)
-		require.NoError(t, err, "marshaling should succeed for test setup")
-
-		// This test ensures JSON marshaling and unmarshaling succeed when the field has a zero/nil value
-		// Detect if marshaled JSON is an object or primitive to use correct unmarshal target
-		if len(bytes) > 0 && bytes[0] == '{' {
-			// JSON object - unmarshal into map
-			var unmarshaled map[string]interface{}
-			err = json.Unmarshal(bytes, &unmarshaled)
-			require.NoError(t, err, "unmarshaling should succeed for test verification")
-		} else {
-			// JSON primitive (string, number, boolean, null) - unmarshal into interface{}
-			var unmarshaled interface{}
-			err = json.Unmarshal(bytes, &unmarshaled)
-			require.NoError(t, err, "unmarshaling should succeed for test verification")
-		}
-
-		// Note: This does not explicitly assert the presence of a specific JSON field
-		// It verifies that setting a field via setter allows successful JSON round-trip
-	})
-
-	t.Run("SetCompleteRequest_MarksExplicit", func(t *testing.T) {
-		t.Parallel()
-		// Arrange
-		obj := &AgentStreamEvent{}
-		var fernTestValueCompleteRequest *CompleteRequest
-
-		// Act
-		obj.SetCompleteRequest(fernTestValueCompleteRequest)
+		obj.SetData(fernTestValueData)
 
 		// Assert - object with explicitly set field can be marshaled/unmarshaled
 		bytes, err := json.Marshal(obj)
@@ -3521,39 +3377,39 @@ func TestSettersMarkExplicitRetryStrategy(t *testing.T) {
 }
 
 func TestSettersStreamHeartbeat(t *testing.T) {
-	t.Run("SetTimestamp", func(t *testing.T) {
+	t.Run("SetData", func(t *testing.T) {
 		obj := &StreamHeartbeat{}
-		var fernTestValueTimestamp *string
-		obj.SetTimestamp(fernTestValueTimestamp)
-		assert.Equal(t, fernTestValueTimestamp, obj.Timestamp)
+		var fernTestValueData *HeartbeatObject
+		obj.SetData(fernTestValueData)
+		assert.Equal(t, fernTestValueData, obj.Data)
 		assert.NotNil(t, obj.explicitFields)
 	})
 
 }
 
 func TestGettersStreamHeartbeat(t *testing.T) {
-	t.Run("GetTimestamp", func(t *testing.T) {
+	t.Run("GetData", func(t *testing.T) {
 		t.Parallel()
 		// Arrange
 		obj := &StreamHeartbeat{}
-		var expected *string
-		obj.Timestamp = expected
+		var expected *HeartbeatObject
+		obj.Data = expected
 
 		// Act & Assert
-		assert.Equal(t, expected, obj.GetTimestamp(), "getter should return the property value")
+		assert.Equal(t, expected, obj.GetData(), "getter should return the property value")
 	})
 
-	t.Run("GetTimestamp_NilValue", func(t *testing.T) {
+	t.Run("GetData_NilValue", func(t *testing.T) {
 		t.Parallel()
 		// Arrange
 		obj := &StreamHeartbeat{}
-		obj.Timestamp = nil
+		obj.Data = nil
 
 		// Act & Assert
-		assert.Nil(t, obj.GetTimestamp(), "getter should return nil when property is nil")
+		assert.Nil(t, obj.GetData(), "getter should return nil when property is nil")
 	})
 
-	t.Run("GetTimestamp_NilReceiver", func(t *testing.T) {
+	t.Run("GetData_NilReceiver", func(t *testing.T) {
 		t.Parallel()
 		var obj *StreamHeartbeat
 		// Should not panic - getters should handle nil receiver gracefully
@@ -3562,20 +3418,20 @@ func TestGettersStreamHeartbeat(t *testing.T) {
 				t.Errorf("Getter panicked on nil receiver: %v", r)
 			}
 		}()
-		_ = obj.GetTimestamp() // Should return zero value
+		_ = obj.GetData() // Should return zero value
 	})
 
 }
 
 func TestSettersMarkExplicitStreamHeartbeat(t *testing.T) {
-	t.Run("SetTimestamp_MarksExplicit", func(t *testing.T) {
+	t.Run("SetData_MarksExplicit", func(t *testing.T) {
 		t.Parallel()
 		// Arrange
 		obj := &StreamHeartbeat{}
-		var fernTestValueTimestamp *string
+		var fernTestValueData *HeartbeatObject
 
 		// Act
-		obj.SetTimestamp(fernTestValueTimestamp)
+		obj.SetData(fernTestValueData)
 
 		// Assert - object with explicitly set field can be marshaled/unmarshaled
 		bytes, err := json.Marshal(obj)
@@ -6338,39 +6194,39 @@ func TestSettersMarkExplicitTaskStatus(t *testing.T) {
 }
 
 func TestSettersTaskStreamEvent(t *testing.T) {
-	t.Run("SetTaskEvent", func(t *testing.T) {
+	t.Run("SetData", func(t *testing.T) {
 		obj := &TaskStreamEvent{}
-		var fernTestValueTaskEvent *TaskEventDataTaskEvent
-		obj.SetTaskEvent(fernTestValueTaskEvent)
-		assert.Equal(t, fernTestValueTaskEvent, obj.TaskEvent)
+		var fernTestValueData *TaskEventData
+		obj.SetData(fernTestValueData)
+		assert.Equal(t, fernTestValueData, obj.Data)
 		assert.NotNil(t, obj.explicitFields)
 	})
 
 }
 
 func TestGettersTaskStreamEvent(t *testing.T) {
-	t.Run("GetTaskEvent", func(t *testing.T) {
+	t.Run("GetData", func(t *testing.T) {
 		t.Parallel()
 		// Arrange
 		obj := &TaskStreamEvent{}
-		var expected *TaskEventDataTaskEvent
-		obj.TaskEvent = expected
+		var expected *TaskEventData
+		obj.Data = expected
 
 		// Act & Assert
-		assert.Equal(t, expected, obj.GetTaskEvent(), "getter should return the property value")
+		assert.Equal(t, expected, obj.GetData(), "getter should return the property value")
 	})
 
-	t.Run("GetTaskEvent_NilValue", func(t *testing.T) {
+	t.Run("GetData_NilValue", func(t *testing.T) {
 		t.Parallel()
 		// Arrange
 		obj := &TaskStreamEvent{}
-		obj.TaskEvent = nil
+		obj.Data = nil
 
 		// Act & Assert
-		assert.Nil(t, obj.GetTaskEvent(), "getter should return nil when property is nil")
+		assert.Nil(t, obj.GetData(), "getter should return nil when property is nil")
 	})
 
-	t.Run("GetTaskEvent_NilReceiver", func(t *testing.T) {
+	t.Run("GetData_NilReceiver", func(t *testing.T) {
 		t.Parallel()
 		var obj *TaskStreamEvent
 		// Should not panic - getters should handle nil receiver gracefully
@@ -6379,20 +6235,20 @@ func TestGettersTaskStreamEvent(t *testing.T) {
 				t.Errorf("Getter panicked on nil receiver: %v", r)
 			}
 		}()
-		_ = obj.GetTaskEvent() // Should return zero value
+		_ = obj.GetData() // Should return zero value
 	})
 
 }
 
 func TestSettersMarkExplicitTaskStreamEvent(t *testing.T) {
-	t.Run("SetTaskEvent_MarksExplicit", func(t *testing.T) {
+	t.Run("SetData_MarksExplicit", func(t *testing.T) {
 		t.Parallel()
 		// Arrange
 		obj := &TaskStreamEvent{}
-		var fernTestValueTaskEvent *TaskEventDataTaskEvent
+		var fernTestValueData *TaskEventData
 
 		// Act
-		obj.SetTaskEvent(fernTestValueTaskEvent)
+		obj.SetData(fernTestValueData)
 
 		// Assert - object with explicitly set field can be marshaled/unmarshaled
 		bytes, err := json.Marshal(obj)
