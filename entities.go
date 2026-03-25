@@ -535,15 +535,11 @@ func (e *EntityEventResponse) String() string {
 }
 
 var (
-	entityStreamEventFieldEventType = big.NewInt(1 << 0)
-	entityStreamEventFieldTime      = big.NewInt(1 << 1)
-	entityStreamEventFieldEntity    = big.NewInt(1 << 2)
+	entityStreamEventFieldData = big.NewInt(1 << 0)
 )
 
 type EntityStreamEvent struct {
-	EventType *EntityEventEventType `json:"eventType,omitempty" url:"eventType,omitempty"`
-	Time      *time.Time            `json:"time,omitempty" url:"time,omitempty"`
-	Entity    *Entity               `json:"entity,omitempty" url:"entity,omitempty"`
+	Data *EntityEvent `json:"data" url:"data"`
 
 	// Private bitmask of fields set to an explicit value and therefore not to be omitted
 	explicitFields *big.Int `json:"-" url:"-"`
@@ -552,25 +548,11 @@ type EntityStreamEvent struct {
 	rawJSON         json.RawMessage
 }
 
-func (e *EntityStreamEvent) GetEventType() *EntityEventEventType {
+func (e *EntityStreamEvent) GetData() *EntityEvent {
 	if e == nil {
 		return nil
 	}
-	return e.EventType
-}
-
-func (e *EntityStreamEvent) GetTime() *time.Time {
-	if e == nil {
-		return nil
-	}
-	return e.Time
-}
-
-func (e *EntityStreamEvent) GetEntity() *Entity {
-	if e == nil {
-		return nil
-	}
-	return e.Entity
+	return e.Data
 }
 
 func (e *EntityStreamEvent) GetExtraProperties() map[string]interface{} {
@@ -587,40 +569,20 @@ func (e *EntityStreamEvent) require(field *big.Int) {
 	e.explicitFields.Or(e.explicitFields, field)
 }
 
-// SetEventType sets the EventType field and marks it as non-optional;
+// SetData sets the Data field and marks it as non-optional;
 // this prevents an empty or null value for this field from being omitted during serialization.
-func (e *EntityStreamEvent) SetEventType(eventType *EntityEventEventType) {
-	e.EventType = eventType
-	e.require(entityStreamEventFieldEventType)
-}
-
-// SetTime sets the Time field and marks it as non-optional;
-// this prevents an empty or null value for this field from being omitted during serialization.
-func (e *EntityStreamEvent) SetTime(time *time.Time) {
-	e.Time = time
-	e.require(entityStreamEventFieldTime)
-}
-
-// SetEntity sets the Entity field and marks it as non-optional;
-// this prevents an empty or null value for this field from being omitted during serialization.
-func (e *EntityStreamEvent) SetEntity(entity *Entity) {
-	e.Entity = entity
-	e.require(entityStreamEventFieldEntity)
+func (e *EntityStreamEvent) SetData(data *EntityEvent) {
+	e.Data = data
+	e.require(entityStreamEventFieldData)
 }
 
 func (e *EntityStreamEvent) UnmarshalJSON(data []byte) error {
-	type embed EntityStreamEvent
-	var unmarshaler = struct {
-		embed
-		Time *internal.DateTime `json:"time,omitempty"`
-	}{
-		embed: embed(*e),
-	}
-	if err := json.Unmarshal(data, &unmarshaler); err != nil {
+	type unmarshaler EntityStreamEvent
+	var value unmarshaler
+	if err := json.Unmarshal(data, &value); err != nil {
 		return err
 	}
-	*e = EntityStreamEvent(unmarshaler.embed)
-	e.Time = unmarshaler.Time.TimePtr()
+	*e = EntityStreamEvent(value)
 	extraProperties, err := internal.ExtractExtraProperties(data, *e)
 	if err != nil {
 		return err
@@ -634,10 +596,8 @@ func (e *EntityStreamEvent) MarshalJSON() ([]byte, error) {
 	type embed EntityStreamEvent
 	var marshaler = struct {
 		embed
-		Time *internal.DateTime `json:"time,omitempty"`
 	}{
 		embed: embed(*e),
-		Time:  internal.NewOptionalDateTime(e.Time),
 	}
 	explicitMarshaler := internal.HandleExplicitFields(marshaler, e.explicitFields)
 	return json.Marshal(explicitMarshaler)
@@ -659,12 +619,11 @@ func (e *EntityStreamEvent) String() string {
 }
 
 var (
-	entityStreamHeartbeatFieldTimestamp = big.NewInt(1 << 0)
+	entityStreamHeartbeatFieldData = big.NewInt(1 << 0)
 )
 
 type EntityStreamHeartbeat struct {
-	// The timestamp at which the heartbeat message was sent.
-	Timestamp *string `json:"timestamp,omitempty" url:"timestamp,omitempty"`
+	Data *HeartbeatObject `json:"data" url:"data"`
 
 	// Private bitmask of fields set to an explicit value and therefore not to be omitted
 	explicitFields *big.Int `json:"-" url:"-"`
@@ -673,11 +632,11 @@ type EntityStreamHeartbeat struct {
 	rawJSON         json.RawMessage
 }
 
-func (e *EntityStreamHeartbeat) GetTimestamp() *string {
+func (e *EntityStreamHeartbeat) GetData() *HeartbeatObject {
 	if e == nil {
 		return nil
 	}
-	return e.Timestamp
+	return e.Data
 }
 
 func (e *EntityStreamHeartbeat) GetExtraProperties() map[string]interface{} {
@@ -694,11 +653,11 @@ func (e *EntityStreamHeartbeat) require(field *big.Int) {
 	e.explicitFields.Or(e.explicitFields, field)
 }
 
-// SetTimestamp sets the Timestamp field and marks it as non-optional;
+// SetData sets the Data field and marks it as non-optional;
 // this prevents an empty or null value for this field from being omitted during serialization.
-func (e *EntityStreamHeartbeat) SetTimestamp(timestamp *string) {
-	e.Timestamp = timestamp
-	e.require(entityStreamHeartbeatFieldTimestamp)
+func (e *EntityStreamHeartbeat) SetData(data *HeartbeatObject) {
+	e.Data = data
+	e.require(entityStreamHeartbeatFieldData)
 }
 
 func (e *EntityStreamHeartbeat) UnmarshalJSON(data []byte) error {
@@ -743,7 +702,6 @@ func (e *EntityStreamHeartbeat) String() string {
 	return fmt.Sprintf("%#v", e)
 }
 
-// The stream event response.
 type StreamEntitiesResponse struct {
 	Event     string
 	Heartbeat *EntityStreamHeartbeat

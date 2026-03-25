@@ -602,15 +602,11 @@ func (a *AgentRequest) String() string {
 }
 
 var (
-	agentStreamEventFieldExecuteRequest  = big.NewInt(1 << 0)
-	agentStreamEventFieldCancelRequest   = big.NewInt(1 << 1)
-	agentStreamEventFieldCompleteRequest = big.NewInt(1 << 2)
+	agentStreamEventFieldData = big.NewInt(1 << 0)
 )
 
 type AgentStreamEvent struct {
-	ExecuteRequest  *ExecuteRequest  `json:"executeRequest,omitempty" url:"executeRequest,omitempty"`
-	CancelRequest   *CancelRequest   `json:"cancelRequest,omitempty" url:"cancelRequest,omitempty"`
-	CompleteRequest *CompleteRequest `json:"completeRequest,omitempty" url:"completeRequest,omitempty"`
+	Data *AgentTaskRequest `json:"data" url:"data"`
 
 	// Private bitmask of fields set to an explicit value and therefore not to be omitted
 	explicitFields *big.Int `json:"-" url:"-"`
@@ -619,25 +615,11 @@ type AgentStreamEvent struct {
 	rawJSON         json.RawMessage
 }
 
-func (a *AgentStreamEvent) GetExecuteRequest() *ExecuteRequest {
+func (a *AgentStreamEvent) GetData() *AgentTaskRequest {
 	if a == nil {
 		return nil
 	}
-	return a.ExecuteRequest
-}
-
-func (a *AgentStreamEvent) GetCancelRequest() *CancelRequest {
-	if a == nil {
-		return nil
-	}
-	return a.CancelRequest
-}
-
-func (a *AgentStreamEvent) GetCompleteRequest() *CompleteRequest {
-	if a == nil {
-		return nil
-	}
-	return a.CompleteRequest
+	return a.Data
 }
 
 func (a *AgentStreamEvent) GetExtraProperties() map[string]interface{} {
@@ -654,25 +636,11 @@ func (a *AgentStreamEvent) require(field *big.Int) {
 	a.explicitFields.Or(a.explicitFields, field)
 }
 
-// SetExecuteRequest sets the ExecuteRequest field and marks it as non-optional;
+// SetData sets the Data field and marks it as non-optional;
 // this prevents an empty or null value for this field from being omitted during serialization.
-func (a *AgentStreamEvent) SetExecuteRequest(executeRequest *ExecuteRequest) {
-	a.ExecuteRequest = executeRequest
-	a.require(agentStreamEventFieldExecuteRequest)
-}
-
-// SetCancelRequest sets the CancelRequest field and marks it as non-optional;
-// this prevents an empty or null value for this field from being omitted during serialization.
-func (a *AgentStreamEvent) SetCancelRequest(cancelRequest *CancelRequest) {
-	a.CancelRequest = cancelRequest
-	a.require(agentStreamEventFieldCancelRequest)
-}
-
-// SetCompleteRequest sets the CompleteRequest field and marks it as non-optional;
-// this prevents an empty or null value for this field from being omitted during serialization.
-func (a *AgentStreamEvent) SetCompleteRequest(completeRequest *CompleteRequest) {
-	a.CompleteRequest = completeRequest
-	a.require(agentStreamEventFieldCompleteRequest)
+func (a *AgentStreamEvent) SetData(data *AgentTaskRequest) {
+	a.Data = data
+	a.require(agentStreamEventFieldData)
 }
 
 func (a *AgentStreamEvent) UnmarshalJSON(data []byte) error {
@@ -2392,12 +2360,11 @@ func (r *RetryStrategy) String() string {
 }
 
 var (
-	streamHeartbeatFieldTimestamp = big.NewInt(1 << 0)
+	streamHeartbeatFieldData = big.NewInt(1 << 0)
 )
 
 type StreamHeartbeat struct {
-	// The timestamp at which the heartbeat message was sent.
-	Timestamp *string `json:"timestamp,omitempty" url:"timestamp,omitempty"`
+	Data *HeartbeatObject `json:"data" url:"data"`
 
 	// Private bitmask of fields set to an explicit value and therefore not to be omitted
 	explicitFields *big.Int `json:"-" url:"-"`
@@ -2406,11 +2373,11 @@ type StreamHeartbeat struct {
 	rawJSON         json.RawMessage
 }
 
-func (s *StreamHeartbeat) GetTimestamp() *string {
+func (s *StreamHeartbeat) GetData() *HeartbeatObject {
 	if s == nil {
 		return nil
 	}
-	return s.Timestamp
+	return s.Data
 }
 
 func (s *StreamHeartbeat) GetExtraProperties() map[string]interface{} {
@@ -2427,11 +2394,11 @@ func (s *StreamHeartbeat) require(field *big.Int) {
 	s.explicitFields.Or(s.explicitFields, field)
 }
 
-// SetTimestamp sets the Timestamp field and marks it as non-optional;
+// SetData sets the Data field and marks it as non-optional;
 // this prevents an empty or null value for this field from being omitted during serialization.
-func (s *StreamHeartbeat) SetTimestamp(timestamp *string) {
-	s.Timestamp = timestamp
-	s.require(streamHeartbeatFieldTimestamp)
+func (s *StreamHeartbeat) SetData(data *HeartbeatObject) {
+	s.Data = data
+	s.require(streamHeartbeatFieldData)
 }
 
 func (s *StreamHeartbeat) UnmarshalJSON(data []byte) error {
@@ -3847,12 +3814,11 @@ func (t TaskStatusStatus) Ptr() *TaskStatusStatus {
 }
 
 var (
-	taskStreamEventFieldTaskEvent = big.NewInt(1 << 0)
+	taskStreamEventFieldData = big.NewInt(1 << 0)
 )
 
 type TaskStreamEvent struct {
-	// The task event that occurred.
-	TaskEvent *TaskEventDataTaskEvent `json:"taskEvent,omitempty" url:"taskEvent,omitempty"`
+	Data *TaskEventData `json:"data" url:"data"`
 
 	// Private bitmask of fields set to an explicit value and therefore not to be omitted
 	explicitFields *big.Int `json:"-" url:"-"`
@@ -3861,11 +3827,11 @@ type TaskStreamEvent struct {
 	rawJSON         json.RawMessage
 }
 
-func (t *TaskStreamEvent) GetTaskEvent() *TaskEventDataTaskEvent {
+func (t *TaskStreamEvent) GetData() *TaskEventData {
 	if t == nil {
 		return nil
 	}
-	return t.TaskEvent
+	return t.Data
 }
 
 func (t *TaskStreamEvent) GetExtraProperties() map[string]interface{} {
@@ -3882,11 +3848,11 @@ func (t *TaskStreamEvent) require(field *big.Int) {
 	t.explicitFields.Or(t.explicitFields, field)
 }
 
-// SetTaskEvent sets the TaskEvent field and marks it as non-optional;
+// SetData sets the Data field and marks it as non-optional;
 // this prevents an empty or null value for this field from being omitted during serialization.
-func (t *TaskStreamEvent) SetTaskEvent(taskEvent *TaskEventDataTaskEvent) {
-	t.TaskEvent = taskEvent
-	t.require(taskStreamEventFieldTaskEvent)
+func (t *TaskStreamEvent) SetData(data *TaskEventData) {
+	t.Data = data
+	t.require(taskStreamEventFieldData)
 }
 
 func (t *TaskStreamEvent) UnmarshalJSON(data []byte) error {
@@ -4145,7 +4111,6 @@ func (u *User) String() string {
 	return fmt.Sprintf("%#v", u)
 }
 
-// The stream event response.
 type StreamAsAgentResponse struct {
 	Event        string
 	Heartbeat    *StreamHeartbeat
@@ -4263,7 +4228,6 @@ func (s *StreamAsAgentResponse) validate() error {
 	return nil
 }
 
-// The stream event response.
 type StreamTasksResponse struct {
 	Event     string
 	Heartbeat *StreamHeartbeat
