@@ -5,16 +5,17 @@ package oauth_wire_test
 import (
 	bytes "bytes"
 	context "context"
-	Lattice "github.com/fern-support/lattice-sdk-go/v4"
-	client "github.com/fern-support/lattice-sdk-go/v4/client"
-	option "github.com/fern-support/lattice-sdk-go/v4/option"
-	assert "github.com/stretchr/testify/assert"
-	require "github.com/stretchr/testify/require"
 	io "io"
 	http "net/http"
 	url "net/url"
 	strings "strings"
 	testing "testing"
+
+	Lattice "github.com/fern-support/lattice-sdk-go/v4"
+	client "github.com/fern-support/lattice-sdk-go/v4/client"
+	option "github.com/fern-support/lattice-sdk-go/v4/option"
+	assert "github.com/stretchr/testify/assert"
+	require "github.com/stretchr/testify/require"
 )
 
 // requestCapturingTransport captures HTTP requests for inspection in tests.
